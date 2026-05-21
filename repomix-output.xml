@@ -1,0 +1,5236 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+.prettierrc
+docker-compose.yml
+eslint.config.mjs
+nest-cli.json
+package.json
+README.md
+src/admin/admin.controller.ts
+src/admin/admin.guard.ts
+src/admin/admin.html
+src/admin/admin.module.ts
+src/admin/admin.service.ts
+src/admin/interfaces/admin-user.interface.ts
+src/app.controller.spec.ts
+src/app.controller.ts
+src/app.module.ts
+src/app.service.ts
+src/bot/bot.buttons.ts
+src/bot/bot.content.ts
+src/bot/bot.keyboard.ts
+src/bot/bot.launcher.ts
+src/bot/bot.module.ts
+src/bot/bot.service.ts
+src/bot/menu.service.ts
+src/content/content.module.ts
+src/content/content.service.ts
+src/main.ts
+src/types/session.d.ts
+test/app.e2e-spec.ts
+test/jest-e2e.json
+tsconfig.build.json
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".gitignore">
+# compiled output
+/dist
+/node_modules
+/build
+/data
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# temp directory
+.temp
+.tmp
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+</file>
+
+<file path=".prettierrc">
+{
+  "singleQuote": true,
+  "trailingComma": "all"
+}
+</file>
+
+<file path="docker-compose.yml">
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: rinh_assistant_redis
+    ports:
+      - "6379:6379"
+    restart: always
+</file>
+
+<file path="eslint.config.mjs">
+// @ts-check
+import eslint from '@eslint/js';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  {
+    ignores: ['eslint.config.mjs'],
+  },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  eslintPluginPrettierRecommended,
+  {
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
+      sourceType: 'commonjs',
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-floating-promises': 'warn',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
+    },
+  },
+);
+</file>
+
+<file path="nest-cli.json">
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "deleteOutDir": true
+  }
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "rinh-max-bot",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "dependencies": {
+    "@maxhub/max-bot-api": "^0.2.2",
+    "@nestjs-modules/ioredis": "^2.0.2",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/platform-express": "^11.0.1",
+    "dotenv": "^17.4.1",
+    "ioredis": "^5.9.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.18.0",
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.1",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.10.7",
+    "@types/supertest": "^6.0.2",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^16.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.4.2",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
+</file>
+
+<file path="README.md">
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
+
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
+
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+
+## Description
+
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+
+## Project setup
+
+```bash
+$ npm install
+```
+
+## Compile and run the project
+
+```bash
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
+```
+
+## Run tests
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
+
+## Deployment
+
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+
+```bash
+$ npm install -g @nestjs/mau
+$ mau deploy
+```
+
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+
+## Resources
+
+Check out a few resources that may come in handy when working with NestJS:
+
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+
+## Support
+
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Stay in touch
+
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## License
+
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+</file>
+
+<file path="src/admin/admin.controller.ts">
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Req,
+  Res,
+  UseGuards,
+  HttpCode,
+} from '@nestjs/common';
+import type { Request, Response } from 'express';
+import * as path from 'path';
+import * as fs from 'fs';
+import { AdminGuard, SuperAdminGuard } from './admin.guard';
+import { AdminService } from './admin.service';
+import { ContentService } from '../content/content.service';
+import { MenuService } from '../bot/menu.service';
+// import '../../src/types/session';
+
+@Controller('admin')
+export class AdminController {
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly contentService: ContentService,
+    private readonly menuService: MenuService,
+  ) {}
+
+  // ── СТРАНИЦА ВХОДА ────────────────────────────────────────────
+
+  @Get('login')
+  showLogin(@Res() res: Response) {
+    res.send(`<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход — Панель управления РГЭУ</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;background:#f5f5f0;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .card{background:#fff;border-radius:14px;padding:40px;width:340px;box-shadow:0 2px 20px rgba(0,0,0,0.09)}
+  h1{font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:6px}
+  .sub{font-size:13px;color:#aaa;margin-bottom:28px}
+  label{font-size:12px;color:#666;display:block;margin-bottom:4px;font-weight:500}
+  input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:14px;outline:none;transition:border .15s}
+  input:focus{border-color:#1D9E75}
+  button{width:100%;padding:11px;background:#1D9E75;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s}
+  button:hover{background:#0F6E56}
+  .error{color:#e53e3e;font-size:13px;margin-bottom:12px;display:none;background:#fff5f5;padding:8px 10px;border-radius:6px}
+  .error.show{display:block}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Панель управления</h1>
+  <div class="sub">Бот РГЭУ (РИНХ)</div>
+  <div class="error" id="err">Неверный логин или пароль</div>
+  <form id="form">
+    <label>Имя пользователя</label>
+    <input type="text" id="uname" placeholder="Введите логин" autocomplete="username" autofocus>
+    <label>Пароль</label>
+    <input type="password" id="pwd" placeholder="Введите пароль" autocomplete="current-password">
+    <button type="submit">Войти</button>
+  </form>
+</div>
+<script>
+document.getElementById('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const r = await fetch('/admin/login', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ username: document.getElementById('uname').value, password: document.getElementById('pwd').value })
+  });
+  if (r.ok) { window.location.href = '/admin'; }
+  else { document.getElementById('err').classList.add('show'); document.getElementById('pwd').value=''; }
+});
+</script>
+</body>
+</html>`);
+  }
+
+  // ── ВХОД / ВЫХОД ──────────────────────────────────────────────
+
+  @Post('login')
+  @HttpCode(200)
+  login(
+    @Body() body: { username: string; password: string },
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const { username, password } = body;
+
+    // Проверяем SuperAdmin
+    if (this.adminService.validateSuperAdmin(username, password)) {
+      req.session.role = 'superAdmin';
+      req.session.username = username;
+      return res.json({ ok: true, role: 'superAdmin' });
+    }
+
+    // Проверяем обычного Admin
+    const user = this.adminService.validateAdmin(username, password);
+    if (user) {
+      req.session.role = 'admin';
+      req.session.username = user.username;
+      return res.json({ ok: true, role: 'admin' });
+    }
+
+    return res.status(401).json({ ok: false });
+  }
+
+  @Post('logout')
+  @HttpCode(200)
+  logout(@Req() req: Request, @Res() res: Response) {
+    req.session.destroy((err) => {
+      if (err) return res.status(500).json({ ok: false });
+      return res.json({ ok: true });
+    });
+  }
+
+  // ── ГЛАВНАЯ СТРАНИЦА ──────────────────────────────────────────
+
+  @Get()
+  showAdmin(@Req() req: Request, @Res() res: Response) {
+    if (!req.session?.role) return res.redirect('/admin/login');
+    const htmlPath = path.resolve(__dirname, 'admin.html');
+    if (fs.existsSync(htmlPath)) return res.sendFile(htmlPath);
+    return res.sendFile(
+      path.resolve(process.cwd(), 'src', 'admin', 'admin.html'),
+    );
+  }
+
+  // ── API: СЕССИЯ ───────────────────────────────────────────────
+
+  @Get('api/session')
+  @UseGuards(AdminGuard)
+  getSession(@Req() req: Request) {
+    return { role: req.session.role, username: req.session.username };
+  }
+
+  // ── API: КОНТЕНТ ──────────────────────────────────────────────
+
+  @Get('api/content')
+  @UseGuards(AdminGuard)
+  getContent() {
+    return this.contentService.getAll();
+  }
+
+  @Put('api/content/:key')
+  @UseGuards(AdminGuard)
+  updateContent(
+    @Param('key') key: string,
+    @Body() body: { value: string },
+    @Req() req: Request,
+  ) {
+    if (!key || body.value === undefined)
+      return { ok: false, error: 'Неверные параметры' };
+
+    const editor = req.session.username || 'admin';
+    this.contentService.update(key, body.value, editor);
+    return { ok: true, key };
+  }
+
+  // ── API: МЕНЮ (superAdmin) ────────────────────────────────────
+
+  @Get('api/menus')
+  @UseGuards(AdminGuard)
+  getMenus() {
+    return this.menuService.getAll();
+  }
+
+  @Post('api/menus')
+  @UseGuards(SuperAdminGuard)
+  createMenu(
+    @Body() body: { id: string; text: string; parent: string | null },
+  ) {
+    try {
+      this.menuService.addMenu(body.id, body.text, body.parent ?? null);
+      return { ok: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Put('api/menus/:id/text')
+  @UseGuards(SuperAdminGuard)
+  updateMenuText(@Param('id') id: string, @Body() body: { text: string }) {
+    try {
+      this.menuService.updateMenuText(id, body.text);
+      return { ok: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Delete('api/menus/:id')
+  @UseGuards(SuperAdminGuard)
+  deleteMenu(@Param('id') id: string) {
+    try {
+      this.adminService.deleteAdmin(id);
+      return { ok: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Post('api/menus/:id/buttons')
+  @UseGuards(SuperAdminGuard)
+  addButton(
+    @Param('id') menuId: string,
+    @Body() body: { label: string; type: 'callback' | 'url'; value: string },
+  ) {
+    try {
+      const btn = this.menuService.addButton(
+        menuId,
+        body.label,
+        body.type,
+        body.value,
+      );
+      return { ok: true, button: btn };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Put('api/menus/:menuId/buttons/:btnId')
+  @UseGuards(SuperAdminGuard)
+  updateButton(
+    @Param('menuId') menuId: string,
+    @Param('btnId') btnId: string,
+    @Body() body: { label: string; type: 'callback' | 'url'; value: string },
+  ) {
+    try {
+      this.menuService.updateButton(
+        menuId,
+        btnId,
+        body.label,
+        body.type,
+        body.value,
+      );
+      return { ok: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Delete('api/menus/:menuId/buttons/:btnId')
+  @UseGuards(SuperAdminGuard)
+  deleteButton(@Param('menuId') menuId: string, @Param('btnId') btnId: string) {
+    try {
+      this.menuService.deleteButton(menuId, btnId);
+      return { ok: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Post('api/menus/:menuId/buttons/:btnId/move')
+  @UseGuards(SuperAdminGuard)
+  moveButton(
+    @Param('menuId') menuId: string,
+    @Param('btnId') btnId: string,
+    @Body() body: { direction: 'up' | 'down' },
+  ) {
+    this.menuService.moveButton(menuId, btnId, body.direction);
+    return { ok: true };
+  }
+
+  // ── API: АДМИНИСТРАТОРЫ (только superAdmin) ───────────────────
+
+  @Get('api/admins')
+  @UseGuards(SuperAdminGuard)
+  getAdmins() {
+    return this.adminService.getAllAdmins();
+  }
+
+  @Post('api/admins')
+  @UseGuards(SuperAdminGuard)
+  createAdmin(@Body() body: { username: string; password: string }) {
+    try {
+      const user = this.adminService.createAdmin(body.username, body.password);
+      return { ok: true, user };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Put('api/admins/:id/password')
+  @UseGuards(SuperAdminGuard)
+  changePassword(@Param('id') id: string, @Body() body: { password: string }) {
+    try {
+      this.adminService.changePassword(id, body.password);
+      return { ok: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Delete('api/admins/:id')
+  @UseGuards(SuperAdminGuard)
+  deleteAdmin(@Param('id') id: string) {
+    try {
+      this.adminService.deleteAdmin(id);
+      return { ok: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      return { ok: false, error: message };
+    }
+  }
+
+  @Get('*path')
+  catchAll(@Req() req: Request, @Res() res: Response) {
+    if (!req.session?.role) return res.redirect('/admin/login');
+    return res.status(404).send('Страница не найдена');
+  }
+}
+</file>
+
+<file path="src/admin/admin.guard.ts">
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import type { Request } from 'express';
+// import '../../src/types/session';
+
+@Injectable()
+export class AdminGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const req = context.switchToHttp().getRequest<Request>();
+    const role = req.session?.role;
+    return role === 'admin' || role === 'superAdmin';
+  }
+}
+
+@Injectable()
+export class SuperAdminGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const req = context.switchToHttp().getRequest<Request>();
+    return req.session?.role === 'superAdmin';
+  }
+}
+</file>
+
+<file path="src/admin/admin.html">
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <title>Панель управления РГЭУ</title>
+    <style>
+      /* ===== RESET ===== */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: #f5f5f0;
+        color: #1a1a1a;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* ===== TOPBAR ===== */
+      .topbar {
+        height: 52px;
+        background: #fff;
+        border-bottom: 1px solid #e8e8e4;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 10px;
+        flex-shrink: 0;
+        z-index: 100;
+      }
+      .topbar-title {
+        font-size: 14px;
+        font-weight: 600;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .role-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .role-badge.superAdmin {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .role-badge.admin {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .logout-btn {
+        padding: 5px 12px;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #666;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .logout-btn:hover {
+        background: #f5f5f0;
+      }
+      .menu-btn {
+        display: none;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+      .menu-btn span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: #444;
+        border-radius: 2px;
+        transition: all 0.2s;
+      }
+      .menu-btn.open span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .menu-btn.open span:nth-child(2) {
+        opacity: 0;
+      }
+      .menu-btn.open span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      /* ===== TABS ===== */
+      .tabs {
+        height: 40px;
+        background: #fff;
+        border-bottom: 1px solid #e8e8e4;
+        display: flex;
+        flex-shrink: 0;
+        overflow-x: auto;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab {
+        padding: 0 16px;
+        font-size: 13px;
+        color: #888;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        transition: color 0.15s;
+      }
+      .tab:hover {
+        color: #1a1a1a;
+      }
+      .tab.active {
+        color: #0f6e56;
+        border-bottom-color: #1d9e75;
+        font-weight: 500;
+      }
+      .tab-icon {
+        font-size: 14px;
+      }
+
+      /* ===== LAYOUT ===== */
+      .layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* ===== SIDEBAR ===== */
+      .sidebar {
+        width: 268px;
+        background: #fff;
+        border-right: 1px solid #e8e8e4;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
+      }
+      .sidebar-search {
+        padding: 10px 12px;
+        border-bottom: 1px solid #f0f0ec;
+      }
+      .search-input {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid #e0e0dc;
+        border-radius: 8px;
+        font-size: 13px;
+        background: #f9f9f6;
+        outline: none;
+      }
+      .search-input:focus {
+        border-color: #1d9e75;
+        background: #fff;
+      }
+      .sidebar-list {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 16px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .sidebar-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      .sidebar-list::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 2px;
+      }
+
+      /* ===== ACCORDION ===== */
+      .acc-group {
+      }
+      .acc-header {
+        padding: 10px 14px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        transition: background 0.1s;
+      }
+      .acc-header:hover {
+        background: #f9f9f6;
+      }
+      .acc-header .chevron {
+        font-size: 10px;
+        transition: transform 0.2s;
+        color: #ccc;
+      }
+      .acc-header.open .chevron {
+        transform: rotate(90deg);
+      }
+      .acc-body {
+        display: none;
+      }
+      .acc-body.open {
+        display: block;
+      }
+
+      /* Sub-accordion (level 2) */
+      .acc-sub-header {
+        padding: 7px 14px 7px 20px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #888;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        transition: background 0.1s;
+      }
+      .acc-sub-header:hover {
+        background: #f5f5f0;
+      }
+      .acc-sub-header .chevron {
+        font-size: 9px;
+        transition: transform 0.2s;
+        color: #ccc;
+      }
+      .acc-sub-header.open .chevron {
+        transform: rotate(90deg);
+      }
+      .acc-sub-body {
+        display: none;
+      }
+      .acc-sub-body.open {
+        display: block;
+      }
+
+      /* Nav items */
+      .nav-item {
+        padding: 7px 16px 7px 28px;
+        font-size: 13px;
+        color: #555;
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        transition: background 0.1s;
+        line-height: 1.4;
+      }
+      .nav-item.l1 {
+        padding-left: 16px;
+      }
+      .nav-item:hover {
+        background: #f5f5f0;
+        color: #1a1a1a;
+      }
+      .nav-item:active {
+        background: #e8f5f0;
+      }
+      .nav-item.active {
+        background: #f0faf5;
+        color: #0f6e56;
+        border-left-color: #1d9e75;
+        font-weight: 500;
+      }
+      .nav-item.modified::after {
+        content: ' ●';
+        color: #f59e0b;
+        font-size: 10px;
+      }
+
+      /* ===== SIDEBAR OVERLAY ===== */
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 199;
+      }
+      .sidebar-overlay.show {
+        display: block;
+      }
+
+      /* ===== MAIN ===== */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #fafaf8;
+        min-width: 0;
+      }
+
+      /* ===== MAIN HEADER ===== */
+      .main-header {
+        background: #fff;
+        border-bottom: 1px solid #e8e8e4;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+      }
+      .main-key {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: #f0f0ec;
+        padding: 2px 7px;
+        border-radius: 4px;
+        color: #888;
+        flex-shrink: 0;
+      }
+      .main-title {
+        font-size: 14px;
+        font-weight: 500;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .header-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .btn-primary {
+        padding: 7px 16px;
+        background: #1d9e75;
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+        white-space: nowrap;
+        min-height: 34px;
+      }
+      .btn-primary:hover {
+        background: #0f6e56;
+      }
+      .btn-primary:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .btn-primary.saved {
+        background: #16a34a;
+      }
+      .btn-primary.error-state {
+        background: #dc2626;
+      }
+      .btn-secondary {
+        padding: 7px 14px;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #555;
+        cursor: pointer;
+        min-height: 34px;
+        white-space: nowrap;
+      }
+      .btn-secondary:hover {
+        background: #f5f5f0;
+      }
+      .btn-danger {
+        padding: 5px 12px;
+        background: transparent;
+        border: 1px solid #fca5a5;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #dc2626;
+        cursor: pointer;
+      }
+      .btn-danger:hover {
+        background: #fef2f2;
+      }
+      .preview-toggle {
+        display: none;
+        padding: 7px 12px;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 12px;
+        color: #555;
+        cursor: pointer;
+        white-space: nowrap;
+        min-height: 34px;
+      }
+      .preview-toggle.active {
+        background: #f0faf5;
+        border-color: #1d9e75;
+        color: #0f6e56;
+      }
+
+      /* ===== EDITOR ===== */
+      .editor-area {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+      }
+      .editor-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 14px;
+        min-width: 0;
+      }
+      .pane-label {
+        font-size: 10px;
+        color: #aaa;
+        margin-bottom: 6px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .editor-textarea {
+        flex: 1;
+        resize: none;
+        border: 1px solid #e0e0dc;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        background: #fff;
+        color: #1a1a1a;
+        outline: none;
+        line-height: 1.7;
+        -webkit-overflow-scrolling: touch;
+      }
+      .editor-textarea:focus {
+        border-color: #1d9e75;
+      }
+      .preview-pane {
+        width: 280px;
+        flex-shrink: 0;
+        border-left: 1px solid #e8e8e4;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+      .preview-content {
+        flex: 1;
+        overflow-y: auto;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #333;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      /* ===== EMPTY STATE ===== */
+      .empty-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        gap: 8px;
+        padding: 20px;
+      }
+      .empty-state p {
+        font-size: 14px;
+        color: #aaa;
+      }
+      .empty-state small {
+        font-size: 12px;
+        color: #bbb;
+        text-align: center;
+      }
+
+      /* ===== PANELS (Меню и Администраторы) ===== */
+      .panel {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .panel-section {
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e8e8e4;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .panel-section-header {
+        padding: 12px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        border-bottom: 1px solid #f0f0ec;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .panel-section-body {
+        padding: 14px 16px;
+      }
+
+      /* Menu tree */
+      .menu-tree-item {
+        border: 1px solid #e8e8e4;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .menu-tree-header {
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        background: #f9f9f6;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .menu-tree-header:hover {
+        background: #f0faf5;
+      }
+      .menu-id {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: #e8e8e4;
+        padding: 1px 6px;
+        border-radius: 3px;
+        color: #666;
+      }
+      .menu-tree-body {
+        display: none;
+        padding: 10px 12px;
+        border-top: 1px solid #f0f0ec;
+      }
+      .menu-tree-body.open {
+        display: block;
+      }
+      .btn-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .btn-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        background: #f9f9f6;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+      .btn-row-label {
+        flex: 1;
+        color: #333;
+      }
+      .btn-row-type {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        background: #e0e0dc;
+        color: #666;
+      }
+      .btn-row-type.url {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .btn-move {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #aaa;
+        padding: 2px 4px;
+        font-size: 13px;
+        border-radius: 3px;
+      }
+      .btn-move:hover {
+        background: #eee;
+        color: #444;
+      }
+
+      /* Form row */
+      .form-row {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        min-width: 100px;
+      }
+      .form-label {
+        font-size: 11px;
+        color: #888;
+        font-weight: 500;
+      }
+      .form-input {
+        padding: 7px 10px;
+        border: 1px solid #e0e0dc;
+        border-radius: 6px;
+        font-size: 13px;
+        outline: none;
+      }
+      .form-input:focus {
+        border-color: #1d9e75;
+      }
+      .form-select {
+        padding: 7px 10px;
+        border: 1px solid #e0e0dc;
+        border-radius: 6px;
+        font-size: 13px;
+        outline: none;
+        background: #fff;
+      }
+
+      /* Admin list */
+      .admin-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid #e8e8e4;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
+      .admin-row-name {
+        flex: 1;
+        font-weight: 500;
+      }
+      .admin-row-date {
+        font-size: 11px;
+        color: #aaa;
+      }
+      .admin-role-badge {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 8px;
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      /* ===== STATUS BAR ===== */
+      .statusbar {
+        height: 28px;
+        background: #fff;
+        border-top: 1px solid #e8e8e4;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #16a34a;
+        flex-shrink: 0;
+      }
+      .status-dot.warn {
+        background: #f59e0b;
+      }
+      .status-dot.error {
+        background: #dc2626;
+      }
+      .status-text {
+        font-size: 11px;
+        color: #888;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .status-count {
+        font-size: 11px;
+        color: #aaa;
+        white-space: nowrap;
+      }
+
+      /* ===== TOAST ===== */
+      .toast {
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: #1a1a1a;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        opacity: 0;
+        transition: all 0.25s;
+        pointer-events: none;
+        z-index: 9999;
+        white-space: nowrap;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ===== MOBILE ===== */
+      @media (max-width: 680px) {
+        .menu-btn {
+          display: flex;
+        }
+        .topbar-sub {
+          display: none;
+        }
+        .sidebar {
+          position: fixed;
+          top: 92px;
+          left: 0;
+          bottom: 0;
+          width: 82vw;
+          max-width: 300px;
+          z-index: 200;
+          transform: translateX(-100%);
+          box-shadow: none;
+          border-right: none;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.12);
+        }
+        .nav-item {
+          padding: 11px 16px 11px 28px;
+          font-size: 14px;
+        }
+        .nav-item.l1 {
+          padding-left: 16px;
+        }
+        .acc-header {
+          padding: 13px 14px;
+        }
+        .acc-sub-header {
+          padding: 10px 14px 10px 20px;
+        }
+        .preview-toggle {
+          display: block;
+        }
+        .preview-pane {
+          display: none;
+        }
+        .preview-pane.mobile-show {
+          display: flex;
+          position: fixed;
+          inset: 92px 0 0 0;
+          width: 100%;
+          z-index: 150;
+          border-left: none;
+          border-top: 1px solid #e8e8e4;
+          padding: 14px;
+        }
+        .btn-primary {
+          padding: 8px 14px;
+          font-size: 13px;
+        }
+        .editor-textarea {
+          font-size: 14px;
+        }
+        .status-count {
+          display: none;
+        }
+      }
+      @media (max-width: 380px) {
+        .main-key {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <button class="menu-btn" id="menu-btn" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title">Панель управления РГЭУ</div>
+      <span class="role-badge" id="role-badge"></span>
+      <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <div class="tab active" onclick="switchTab('content')" id="tab-content">
+        <span class="tab-icon">📝</span>Контент
+      </div>
+      <div
+        class="tab"
+        onclick="switchTab('menus')"
+        id="tab-menus"
+        style="display: none"
+      >
+        <span class="tab-icon">🔘</span>Меню бота
+      </div>
+      <div
+        class="tab"
+        onclick="switchTab('admins')"
+        id="tab-admins"
+        style="display: none"
+      >
+        <span class="tab-icon">👥</span>Администраторы
+      </div>
+    </div>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ===== CONTENT TAB ===== -->
+    <div class="layout" id="pane-content">
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-search">
+          <input
+            class="search-input"
+            type="text"
+            id="search"
+            placeholder="Поиск..."
+            oninput="filterItems(this.value)"
+          />
+        </div>
+        <div class="sidebar-list" id="sidebar-list"></div>
+      </div>
+      <div class="main">
+        <div class="main-header" id="main-header" style="display: none">
+          <span class="main-key" id="main-key"></span>
+          <span class="main-title" id="main-title"></span>
+          <div class="header-actions">
+            <button
+              class="preview-toggle"
+              id="preview-toggle"
+              onclick="toggleMobilePreview()"
+            >
+              Просмотр
+            </button>
+            <button
+              class="btn-primary"
+              id="save-btn"
+              onclick="saveContent()"
+              disabled
+            >
+              Сохранить
+            </button>
+          </div>
+        </div>
+        <div class="editor-area" id="editor-area">
+          <div class="empty-state" id="empty-state">
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.2"
+            >
+              <path
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"
+              />
+            </svg>
+            <p>Выберите раздел</p>
+            <small>Нажмите ☰ или выберите пункт слева</small>
+          </div>
+          <div class="editor-pane" id="editor-pane" style="display: none">
+            <div class="pane-label">Markdown-текст (эмодзи поддерживаются)</div>
+            <textarea
+              class="editor-textarea"
+              id="editor"
+              oninput="onEdit()"
+              autocorrect="off"
+              spellcheck="false"
+            ></textarea>
+          </div>
+          <div class="preview-pane" id="preview-pane" style="display: none">
+            <div
+              class="pane-label"
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              "
+            >
+              Предпросмотр
+              <button
+                onclick="closeMobilePreview()"
+                id="close-preview-btn"
+                style="
+                  display: none;
+                  border: none;
+                  background: transparent;
+                  font-size: 18px;
+                  cursor: pointer;
+                  color: #888;
+                "
+              >
+                ✕
+              </button>
+            </div>
+            <div class="preview-content" id="preview"></div>
+          </div>
+        </div>
+        <div class="statusbar">
+          <div class="status-dot" id="status-dot"></div>
+          <span class="status-text" id="status-text">Загрузка...</span>
+          <span class="status-count" id="char-count"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MENUS TAB ===== -->
+    <div class="layout" id="pane-menus" style="display: none">
+      <div class="panel" id="menus-panel"></div>
+    </div>
+
+    <!-- ===== ADMINS TAB ===== -->
+    <div class="layout" id="pane-admins" style="display: none">
+      <div class="panel" id="admins-panel"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      // ========================
+      // GLOBALS
+      // ========================
+      let currentRole = 'admin';
+      let currentUsername = '';
+      let allContent = {};
+      let allMenus = {};
+      let currentKey = null;
+      let modified = {};
+      let mobilePreviewOpen = false;
+      let sidebarOpen = false;
+      let currentTab = 'content';
+
+      // ========================
+      // ACCORDION CONFIG
+      // ========================
+      const ACCORDION = [
+        {
+          label: 'Факультеты',
+          items: [
+            {
+              key: 'fac_management',
+              label: 'Менеджмента и предпринимательства',
+            },
+            { key: 'fac_trade', label: 'Торгового дела' },
+            { key: 'fac_it', label: 'КТиИБ' },
+            { key: 'fac_accounting', label: 'Учетно-экономический' },
+            { key: 'fac_economics', label: 'Экономики и финансов' },
+            { key: 'fac_law', label: 'Юридический' },
+            { key: 'fac_linguistics', label: 'Лингвистики и журналистики' },
+          ],
+        },
+        {
+          label: 'Кафедры',
+          sub: [
+            {
+              label: 'МиП',
+              items: [
+                { key: 'dep_mip_hr', label: 'Финансовый и HR менеджмент' },
+                {
+                  key: 'dep_mip_strat',
+                  label: 'Общий и стратегический менедж.',
+                },
+                {
+                  key: 'dep_mip_gmu',
+                  label: 'ГМУ и экономическая безопасность',
+                },
+                { key: 'dep_mip_innov', label: 'Инновационный менеджмент' },
+                {
+                  key: 'dep_mip_anticrisis',
+                  label: 'Антикризисное и корп. управление',
+                },
+              ],
+            },
+            {
+              label: 'Торгового дела',
+              items: [
+                { key: 'dep_td_phil', label: 'Философия и культурология' },
+                { key: 'dep_td_comm', label: 'Коммерция и логистика' },
+                { key: 'dep_td_mark', label: 'Маркетинг и реклама' },
+                {
+                  key: 'dep_td_customs',
+                  label: 'Международная торговля и таможня',
+                },
+                { key: 'dep_td_theory', label: 'Экономическая теория' },
+                {
+                  key: 'dep_td_quality',
+                  label: 'Товароведение и управление качеством',
+                },
+              ],
+            },
+            {
+              label: 'КТиИБ',
+              items: [
+                {
+                  key: 'dep_ktib_is',
+                  label: 'Инф. системы и прикл. информатика',
+                },
+                {
+                  key: 'dep_ktib_ai',
+                  label: 'Прикл. математика и технологии ИИ',
+                },
+                {
+                  key: 'dep_ktib_it',
+                  label: 'Информационные технологии и прогр.',
+                },
+                { key: 'dep_ktib_sec', label: 'Информационная безопасность' },
+                { key: 'dep_ktib_sport', label: 'Физвоспитание и спорт' },
+              ],
+            },
+            {
+              label: 'УЭФ',
+              items: [
+                { key: 'dep_uef_acc', label: 'Бухгалтерский учёт' },
+                { key: 'dep_uef_audit', label: 'Аудит' },
+                { key: 'dep_uef_analysis', label: 'Анализ хоз. деятельности' },
+                { key: 'dep_uef_stat', label: 'Статистика и эконометрика' },
+                {
+                  key: 'dep_uef_world',
+                  label: 'Мировая экономика и межд. отношения',
+                },
+              ],
+            },
+            {
+              label: 'ЭиФ',
+              items: [
+                { key: 'dep_eif_bank', label: 'Банковское дело' },
+                { key: 'dep_eif_fin', label: 'Финансы' },
+                { key: 'dep_eif_tax', label: 'Налоги и налогообложение' },
+                { key: 'dep_eif_monit', label: 'Финансовый мониторинг' },
+                {
+                  key: 'dep_eif_reg',
+                  label: 'Экономика региона, отраслей и предпр.',
+                },
+              ],
+            },
+            {
+              label: 'Юридического',
+              items: [
+                { key: 'dep_law_civ', label: 'Гражданское право' },
+                {
+                  key: 'dep_law_hist',
+                  label: 'Исторические науки и политология',
+                },
+                {
+                  key: 'dep_law_const',
+                  label: 'Конституционное и муниц. право',
+                },
+                {
+                  key: 'dep_law_crim_exp',
+                  label: 'Судебная экспертиза и криминалистика',
+                },
+                {
+                  key: 'dep_law_theory',
+                  label: 'Теория и история государства и права',
+                },
+                {
+                  key: 'dep_law_crim',
+                  label: 'Уголовное право и криминология',
+                },
+                {
+                  key: 'dep_law_fin',
+                  label: 'Финансовое и административное право',
+                },
+                { key: 'dep_law_proc', label: 'Процессуальное право' },
+              ],
+            },
+            {
+              label: 'ЛиЖ',
+              items: [
+                {
+                  key: 'dep_lizh_econ',
+                  label: 'Ин. языки для экон. специальностей',
+                },
+                {
+                  key: 'dep_lizh_hum',
+                  label: 'Ин. языки для гум. специальностей',
+                },
+                { key: 'dep_lizh_journ', label: 'Журналистика' },
+                {
+                  key: 'dep_lizh_ling',
+                  label: 'Лингвистика и межкульт. коммуникация',
+                },
+                { key: 'dep_lizh_rus', label: 'Русский язык и культура речи' },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Службы',
+          items: [
+            { key: 'srv_accounting', label: 'Управление бухгалтерского учёта' },
+            { key: 'srv_hr', label: 'Управление по персоналу' },
+            { key: 'srv_admission', label: 'Работа с абитуриентами' },
+            { key: 'srv_ic', label: 'Международное сотрудничество' },
+            { key: 'srv_education', label: 'Воспитательная работа' },
+            { key: 'srv_projects', label: 'Центр проектной деятельности' },
+            { key: 'srv_student_bureau', label: 'Студенческое бюро' },
+            { key: 'srv_student_trade', label: 'Профсоюзный комитет' },
+          ],
+        },
+        {
+          label: 'Библиотеки',
+          items: [
+            { key: 'lib_subscriptions', label: 'Абонементы' },
+            { key: 'lib_reading_rooms', label: 'Читальные залы' },
+            { key: 'lib_e_reading_rooms', label: 'Электронный читальный зал' },
+            { key: 'lib_e_education_resources', label: 'Онлайн-ресурсы' },
+          ],
+        },
+        {
+          label: 'Дополнительно',
+          items: [
+            { key: 'contacts_masters', label: 'Институт магистратуры' },
+            { key: 'contacts_phd', label: 'Аспирантура и докторантура' },
+            { key: 'contacts_hostels', label: 'Общежития' },
+          ],
+        },
+        {
+          label: 'Секции и кружки',
+          items: [
+            { key: 'sec_patriot', label: 'Центр патриотического воспитания' },
+            { key: 'sec_sport', label: 'Спортивные секции' },
+            { key: 'sec_creative', label: 'Творческие кружки' },
+            { key: 'sec_science', label: 'Научные конференции' },
+          ],
+        },
+      ];
+
+      // ========================
+      // INIT
+      // ========================
+      async function init() {
+        try {
+          const r = await fetch('/admin/api/session');
+          if (r.status === 401 || r.status === 403) {
+            window.location.href = '/admin/login';
+            return;
+          }
+          const session = await r.json();
+          currentRole = session.role;
+          currentUsername = session.username;
+          document.getElementById('role-badge').textContent =
+            currentRole === 'superAdmin' ? '⭐ SuperAdmin' : '👤 Admin';
+          document.getElementById('role-badge').className =
+            'role-badge ' + currentRole;
+
+          if (currentRole === 'superAdmin') {
+            document.getElementById('tab-menus').style.display = 'flex';
+            document.getElementById('tab-admins').style.display = 'flex';
+          }
+          await loadContent();
+        } catch (e) {
+          setStatus('Ошибка подключения', 'error');
+        }
+      }
+
+      // ========================
+      // TABS
+      // ========================
+      function switchTab(tab) {
+        currentTab = tab;
+        ['content', 'menus', 'admins'].forEach((t) => {
+          document.getElementById('pane-' + t).style.display =
+            t === tab ? 'flex' : 'none';
+          document
+            .getElementById('tab-' + t)
+            ?.classList.toggle('active', t === tab);
+        });
+        if (tab === 'menus' && Object.keys(allMenus).length === 0) loadMenus();
+        if (tab === 'admins') loadAdmins();
+      }
+
+      // ========================
+      // CONTENT TAB
+      // ========================
+      async function loadContent() {
+        try {
+          const r = await fetch('/admin/api/content');
+          if (r.status === 401) {
+            window.location.href = '/admin/login';
+            return;
+          }
+          allContent = await r.json();
+          renderSidebar(allContent);
+          setStatus(
+            'Данные загружены (' + Object.keys(allContent).length + ' записей)',
+            'ok',
+          );
+        } catch (e) {
+          setStatus('Ошибка загрузки контента', 'error');
+        }
+      }
+
+      function renderSidebar(content, query = '') {
+        const list = document.getElementById('sidebar-list');
+        list.innerHTML = '';
+
+        for (const group of ACCORDION) {
+          const groupEl = document.createElement('div');
+          groupEl.className = 'acc-group';
+
+          // Собираем все ключи группы
+          const allKeys = group.sub
+            ? group.sub.flatMap((s) => s.items.map((i) => i.key))
+            : (group.items || []).map((i) => i.key);
+
+          const matchKeys = allKeys.filter((k) => {
+            if (!query) return true;
+            const item = (
+              group.sub ? group.sub.flatMap((s) => s.items) : group.items
+            ).find((i) => i.key === k);
+            return (
+              item &&
+              (item.label.toLowerCase().includes(query.toLowerCase()) ||
+                k.includes(query.toLowerCase()))
+            );
+          });
+
+          if (query && matchKeys.length === 0) continue;
+
+          const header = document.createElement('div');
+          header.className = 'acc-header' + (!query ? ' open' : '');
+          header.innerHTML = `<span>${group.label}</span><span class="chevron">▶</span>`;
+          header.onclick = () => {
+            header.classList.toggle('open');
+            body.classList.toggle('open');
+          };
+          groupEl.appendChild(header);
+
+          const body = document.createElement('div');
+          body.className = 'acc-body' + (!query ? ' open' : '');
+
+          if (group.sub) {
+            // 3-level: group → sub → items
+            for (const sub of group.sub) {
+              const subKeys = sub.items
+                .map((i) => i.key)
+                .filter((k) => {
+                  if (!query) return true;
+                  const item = sub.items.find((i) => i.key === k);
+                  return (
+                    item &&
+                    (item.label.toLowerCase().includes(query.toLowerCase()) ||
+                      k.includes(query.toLowerCase()))
+                  );
+                });
+              if (query && subKeys.length === 0) continue;
+
+              const subHeader = document.createElement('div');
+              subHeader.className = 'acc-sub-header' + (!query ? ' open' : '');
+              subHeader.innerHTML = `<span>${sub.label}</span><span class="chevron">▶</span>`;
+              const subBody = document.createElement('div');
+              subBody.className = 'acc-sub-body' + (!query ? ' open' : '');
+              subHeader.onclick = () => {
+                subHeader.classList.toggle('open');
+                subBody.classList.toggle('open');
+              };
+
+              for (const item of sub.items) {
+                if (
+                  query &&
+                  !item.label.toLowerCase().includes(query.toLowerCase()) &&
+                  !item.key.includes(query.toLowerCase())
+                )
+                  continue;
+                if (!content[item.key]) continue;
+                subBody.appendChild(makeNavItem(item));
+              }
+
+              body.appendChild(subHeader);
+              body.appendChild(subBody);
+            }
+          } else {
+            // 2-level: group → items
+            for (const item of group.items || []) {
+              if (
+                query &&
+                !item.label.toLowerCase().includes(query.toLowerCase()) &&
+                !item.key.includes(query.toLowerCase())
+              )
+                continue;
+              if (!content[item.key]) continue;
+              const el = makeNavItem(item);
+              el.classList.add('l1');
+              body.appendChild(el);
+            }
+          }
+
+          groupEl.appendChild(body);
+          list.appendChild(groupEl);
+        }
+      }
+
+      function makeNavItem(item) {
+        const el = document.createElement('div');
+        el.className =
+          'nav-item' +
+          (item.key === currentKey ? ' active' : '') +
+          (modified[item.key] ? ' modified' : '');
+        el.textContent = item.label;
+        el.title = item.key;
+        el.onclick = () => {
+          selectKey(item.key, item.label);
+          closeSidebar();
+        };
+        return el;
+      }
+
+      function filterItems(q) {
+        renderSidebar(allContent, q);
+      }
+
+      function selectKey(key, label) {
+        if (currentKey === key) return;
+        if (
+          currentKey &&
+          modified[currentKey] &&
+          !confirm('Есть несохранённые изменения. Продолжить?')
+        )
+          return;
+        currentKey = key;
+        document.getElementById('editor').value = allContent[key] || '';
+        document.getElementById('main-key').textContent = key;
+        document.getElementById('main-title').textContent = label;
+        document.getElementById('main-header').style.display = 'flex';
+        document.getElementById('editor-pane').style.display = 'flex';
+        document.getElementById('empty-state').style.display = 'none';
+        if (window.innerWidth > 680)
+          document.getElementById('preview-pane').style.display = 'flex';
+        updatePreview();
+        updateCharCount();
+        updateSaveBtn();
+        renderSidebar(allContent, document.getElementById('search').value);
+      }
+
+      function onEdit() {
+        const val = document.getElementById('editor').value;
+        if (currentKey)
+          modified[currentKey] = val !== (allContent[currentKey] || '');
+        if (mobilePreviewOpen || window.innerWidth > 680) updatePreview();
+        updateCharCount();
+        updateSaveBtn();
+      }
+
+      function updatePreview() {
+        const val = document.getElementById('editor').value;
+        document.getElementById('preview').textContent = val.replace(
+          /\*\*(.*?)\*\*/g,
+          '$1',
+        );
+      }
+
+      function updateCharCount() {
+        document.getElementById('char-count').textContent =
+          document.getElementById('editor').value.length + ' симв.';
+      }
+
+      function updateSaveBtn() {
+        const btn = document.getElementById('save-btn');
+        btn.disabled = !currentKey || !modified[currentKey];
+        btn.textContent = 'Сохранить';
+        btn.className = 'btn-primary';
+      }
+
+      async function saveContent() {
+        if (!currentKey) return;
+        const value = document.getElementById('editor').value;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.textContent = 'Сохраняю...';
+        try {
+          const r = await fetch(
+            '/admin/api/content/' + encodeURIComponent(currentKey),
+            {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ value }),
+            },
+          );
+          if (r.status === 401) {
+            window.location.href = '/admin/login';
+            return;
+          }
+          if (r.ok) {
+            allContent[currentKey] = value;
+            delete modified[currentKey];
+            btn.textContent = 'Сохранено ✓';
+            btn.className = 'btn-primary saved';
+            showToast('Сохранено ✓');
+            setStatus('Сохранено: ' + currentKey, 'ok');
+            renderSidebar(allContent, document.getElementById('search').value);
+            setTimeout(() => {
+              btn.textContent = 'Сохранить';
+              btn.className = 'btn-primary';
+              btn.disabled = true;
+            }, 2000);
+          } else throw new Error();
+        } catch {
+          btn.textContent = 'Ошибка ✗';
+          btn.className = 'btn-primary error-state';
+          btn.disabled = false;
+          showToast('Ошибка сохранения!');
+          setTimeout(() => {
+            btn.textContent = 'Сохранить';
+            btn.className = 'btn-primary';
+          }, 3000);
+        }
+      }
+
+      // ========================
+      // MENUS TAB
+      // ========================
+      async function loadMenus() {
+        try {
+          const r = await fetch('/admin/api/menus');
+          if (!r.ok) return;
+          allMenus = await r.json();
+          renderMenus();
+        } catch (e) {}
+      }
+
+      function renderMenus() {
+        const panel = document.getElementById('menus-panel');
+        panel.innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-header">
+        Структура меню бота
+        <span style="font-size:11px;color:#aaa;font-weight:400">Кликните на меню для редактирования</span>
+      </div>
+      <div class="panel-section-body" id="menu-tree"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-header">Добавить новое меню</div>
+      <div class="panel-section-body">
+        <div class="form-row">
+          <div class="form-group"><div class="form-label">ID меню (уникальный, латиница)</div><input class="form-input" id="new-menu-id" placeholder="например: my_custom_menu"></div>
+          <div class="form-group"><div class="form-label">Текст над кнопками</div><input class="form-input" id="new-menu-text" placeholder="Выберите раздел:"></div>
+          <div class="form-group" style="flex:0"><div class="form-label">Родитель</div>
+            <select class="form-select" id="new-menu-parent"><option value="">нет</option>${Object.keys(
+              allMenus,
+            )
+              .map((k) => `<option value="${k}">${k}</option>`)
+              .join('')}</select>
+          </div>
+          <button class="btn-primary" style="flex:0;align-self:flex-end" onclick="addMenu()">+ Создать</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+        const tree = document.getElementById('menu-tree');
+        for (const [menuId, menu] of Object.entries(allMenus)) {
+          tree.appendChild(renderMenuNode(menuId, menu));
+        }
+      }
+
+      function renderMenuNode(menuId, menu) {
+        const node = document.createElement('div');
+        node.className = 'menu-tree-item';
+        node.innerHTML = `
+    <div class="menu-tree-header" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span class="menu-id">${menuId}</span>
+      <span style="flex:1;color:#555;font-size:12px;margin-left:8px">${menu.text.slice(0, 50)}${menu.text.length > 50 ? '...' : ''}</span>
+      ${menu.parent ? `<span style="font-size:11px;color:#aaa">← ${menu.parent}</span>` : ''}
+      <button class="btn-danger" style="margin-left:8px" onclick="event.stopPropagation();deleteMenu('${menuId}')">✕</button>
+    </div>
+    <div class="menu-tree-body">
+      <div style="margin-bottom:8px">
+        <div class="form-label" style="margin-bottom:4px">Текст над кнопками</div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" style="flex:1" id="menu-text-${menuId}" value="${menu.text.replace(/"/g, '&quot;')}">
+          <button class="btn-primary" style="flex:0" onclick="saveMenuText('${menuId}')">Сохранить</button>
+        </div>
+      </div>
+      <div class="pane-label">Кнопки (${menu.buttons.length})</div>
+      <div class="btn-list" id="btn-list-${menuId}">
+        ${menu.buttons
+          .map(
+            (btn) => `
+          <div class="btn-row" id="btn-${btn.id}">
+            <span class="btn-row-label">${btn.label}</span>
+            <span class="btn-row-type ${btn.type}">${btn.type}</span>
+            <span style="font-size:11px;color:#aaa;font-family:monospace;flex:0;white-space:nowrap">${btn.value.slice(0, 20)}${btn.value.length > 20 ? '...' : ''}</span>
+            <button class="btn-move" onclick="moveBtn('${menuId}','${btn.id}','up')" title="Вверх">↑</button>
+            <button class="btn-move" onclick="moveBtn('${menuId}','${btn.id}','down')" title="Вниз">↓</button>
+            <button class="btn-move" onclick="editBtn('${menuId}','${btn.id}','${btn.label.replace(/'/g, "\\'")}','${btn.type}','${btn.value.replace(/'/g, "\\'")}')">✏️</button>
+            <button class="btn-danger" onclick="deleteBtn('${menuId}','${btn.id}')">✕</button>
+          </div>`,
+          )
+          .join('')}
+      </div>
+      <div class="form-row" style="margin-top:10px">
+        <div class="form-group"><div class="form-label">Текст кнопки</div><input class="form-input" id="new-btn-label-${menuId}" placeholder="🏫 Название раздела"></div>
+        <div class="form-group" style="flex:0"><div class="form-label">Тип</div>
+          <select class="form-select" id="new-btn-type-${menuId}">
+            <option value="callback">callback</option>
+            <option value="url">url</option>
+          </select>
+        </div>
+        <div class="form-group"><div class="form-label">Значение (ID меню или URL)</div><input class="form-input" id="new-btn-value-${menuId}" placeholder="menu_id или https://..."></div>
+        <button class="btn-primary" style="flex:0;align-self:flex-end" onclick="addBtn('${menuId}')">+ Добавить</button>
+      </div>
+    </div>`;
+        return node;
+      }
+
+      async function addMenu() {
+        const id = document.getElementById('new-menu-id').value.trim();
+        const text = document.getElementById('new-menu-text').value.trim();
+        const parent = document.getElementById('new-menu-parent').value || null;
+        if (!id || !text) {
+          showToast('Заполните ID и текст');
+          return;
+        }
+        const r = await fetch('/admin/api/menus', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, text, parent }),
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Меню создано');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function deleteMenu(menuId) {
+        if (
+          !confirm(
+            `Удалить меню "${menuId}"? Кнопки из других меню, ссылающиеся на него, тоже удалятся.`,
+          )
+        )
+          return;
+        const r = await fetch('/admin/api/menus/' + menuId, {
+          method: 'DELETE',
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Удалено');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function saveMenuText(menuId) {
+        const text = document.getElementById('menu-text-' + menuId).value;
+        const r = await fetch('/admin/api/menus/' + menuId + '/text', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        const d = await r.json();
+        if (d.ok) showToast('Текст меню сохранён');
+        else showToast('Ошибка: ' + d.error);
+      }
+
+      async function addBtn(menuId) {
+        const label = document
+          .getElementById('new-btn-label-' + menuId)
+          .value.trim();
+        const type = document.getElementById('new-btn-type-' + menuId).value;
+        const value = document
+          .getElementById('new-btn-value-' + menuId)
+          .value.trim();
+        if (!label || !value) {
+          showToast('Заполните текст и значение кнопки');
+          return;
+        }
+        const r = await fetch('/admin/api/menus/' + menuId + '/buttons', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, type, value }),
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Кнопка добавлена');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function deleteBtn(menuId, btnId) {
+        if (!confirm('Удалить кнопку?')) return;
+        const r = await fetch(
+          '/admin/api/menus/' + menuId + '/buttons/' + btnId,
+          { method: 'DELETE' },
+        );
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Кнопка удалена');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function moveBtn(menuId, btnId, direction) {
+        const r = await fetch(
+          '/admin/api/menus/' + menuId + '/buttons/' + btnId + '/move',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ direction }),
+          },
+        );
+        const d = await r.json();
+        if (d.ok) await loadMenus();
+      }
+
+      function editBtn(menuId, btnId, label, type, value) {
+        const newLabel = prompt('Текст кнопки:', label);
+        if (newLabel === null) return;
+        const newValue = prompt('Значение (ID меню или URL):', value);
+        if (newValue === null) return;
+        fetch('/admin/api/menus/' + menuId + '/buttons/' + btnId, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label: newLabel, type, value: newValue }),
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.ok) {
+              showToast('Кнопка обновлена');
+              loadMenus();
+            } else showToast('Ошибка: ' + d.error);
+          });
+      }
+
+      // ========================
+      // ADMINS TAB
+      // ========================
+      async function loadAdmins() {
+        try {
+          const r = await fetch('/admin/api/admins');
+          if (!r.ok) return;
+          const admins = await r.json();
+          renderAdmins(admins);
+        } catch (e) {}
+      }
+
+      function renderAdmins(admins) {
+        const panel = document.getElementById('admins-panel');
+        const superName = '(из .env)';
+        panel.innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-header">SuperAdmin</div>
+      <div class="panel-section-body">
+        <div class="admin-row">
+          <span class="admin-role-badge" style="background:#fef3c7;color:#92400e">⭐ superAdmin</span>
+          <span class="admin-row-name">${currentRole === 'superAdmin' ? currentUsername : '***'}</span>
+          <span class="admin-row-date">${superName}</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-header">
+        Администраторы
+        <span style="font-size:11px;color:#aaa;font-weight:400">${admins.length} чел.</span>
+      </div>
+      <div class="panel-section-body">
+        ${
+          admins.length === 0
+            ? '<p style="color:#aaa;font-size:13px">Пока нет ни одного администратора</p>'
+            : admins
+                .map(
+                  (u) => `
+            <div class="admin-row">
+              <span class="admin-role-badge">admin</span>
+              <span class="admin-row-name">${u.username}</span>
+              <span class="admin-row-date">${new Date(u.createdAt).toLocaleDateString('ru-RU')}</span>
+              <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="changePass('${u.id}','${u.username}')">Пароль</button>
+              <button class="btn-danger" onclick="deleteAdmin('${u.id}','${u.username}')">Удалить</button>
+            </div>`,
+                )
+                .join('')
+        }
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-header">Добавить администратора</div>
+      <div class="panel-section-body">
+        <div class="form-row">
+          <div class="form-group"><div class="form-label">Имя пользователя</div><input class="form-input" id="new-admin-name" placeholder="Имя без пробелов"></div>
+          <div class="form-group"><div class="form-label">Пароль</div><input class="form-input" type="password" id="new-admin-pass" placeholder="Минимум 6 символов"></div>
+          <button class="btn-primary" style="flex:0;align-self:flex-end" onclick="createAdmin()">+ Добавить</button>
+        </div>
+      </div>
+    </div>`;
+      }
+
+      async function createAdmin() {
+        const username = document.getElementById('new-admin-name').value.trim();
+        const password = document.getElementById('new-admin-pass').value;
+        if (!username || !password) {
+          showToast('Заполните имя и пароль');
+          return;
+        }
+        if (password.length < 6) {
+          showToast('Пароль минимум 6 символов');
+          return;
+        }
+        const r = await fetch('/admin/api/admins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Администратор создан');
+          await loadAdmins();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function deleteAdmin(id, name) {
+        if (!confirm(`Удалить администратора "${name}"?`)) return;
+        const r = await fetch('/admin/api/admins/' + id, { method: 'DELETE' });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Удалено');
+          await loadAdmins();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function changePass(id, name) {
+        const newPass = prompt(`Новый пароль для "${name}":`);
+        if (!newPass || newPass.length < 6) {
+          if (newPass !== null) showToast('Пароль минимум 6 символов');
+          return;
+        }
+        const r = await fetch('/admin/api/admins/' + id + '/password', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: newPass }),
+        });
+        const d = await r.json();
+        if (d.ok) showToast('Пароль изменён');
+        else showToast('Ошибка: ' + d.error);
+      }
+
+      // ========================
+      // SIDEBAR MOBILE
+      // ========================
+      function toggleSidebar() {
+        sidebarOpen ? closeSidebar() : openSidebar();
+      }
+      function openSidebar() {
+        sidebarOpen = true;
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('overlay').classList.add('show');
+        document.getElementById('menu-btn').classList.add('open');
+      }
+      function closeSidebar() {
+        sidebarOpen = false;
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('show');
+        document.getElementById('menu-btn').classList.remove('open');
+      }
+
+      // ========================
+      // PREVIEW MOBILE
+      // ========================
+      function toggleMobilePreview() {
+        mobilePreviewOpen ? closeMobilePreview() : openMobilePreview();
+      }
+      function openMobilePreview() {
+        mobilePreviewOpen = true;
+        updatePreview();
+        const p = document.getElementById('preview-pane');
+        p.style.display = 'flex';
+        p.classList.add('mobile-show');
+        document.getElementById('close-preview-btn').style.display = 'block';
+        document.getElementById('preview-toggle').classList.add('active');
+        document.getElementById('preview-toggle').textContent = 'Закрыть';
+      }
+      function closeMobilePreview() {
+        mobilePreviewOpen = false;
+        const p = document.getElementById('preview-pane');
+        p.classList.remove('mobile-show');
+        if (window.innerWidth > 680 && currentKey) p.style.display = 'flex';
+        else p.style.display = 'none';
+        document.getElementById('close-preview-btn').style.display = 'none';
+        document.getElementById('preview-toggle').classList.remove('active');
+        document.getElementById('preview-toggle').textContent = 'Просмотр';
+      }
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 680 && currentKey) {
+          const p = document.getElementById('preview-pane');
+          p.style.display = 'flex';
+          p.classList.remove('mobile-show');
+          mobilePreviewOpen = false;
+        }
+      });
+
+      // ========================
+      // UTILITIES
+      // ========================
+      async function logout() {
+        await fetch('/admin/logout', { method: 'POST' });
+        window.location.href = '/admin/login';
+      }
+
+      function setStatus(text, type = 'ok') {
+        document.getElementById('status-text').textContent = text;
+        document.getElementById('status-dot').className =
+          'status-dot' +
+          (type === 'error' ? ' error' : type === 'warn' ? ' warn' : '');
+      }
+
+      let toastTimer;
+      function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          if (currentKey && modified[currentKey]) saveContent();
+        }
+        if (e.key === 'Escape') {
+          if (mobilePreviewOpen) closeMobilePreview();
+          if (sidebarOpen) closeSidebar();
+        }
+      });
+
+      init();
+    </script>
+  </body>
+</html>
+</file>
+
+<file path="src/admin/admin.module.ts">
+import { Module } from '@nestjs/common';
+import { AdminController } from './admin.controller';
+import { AdminService } from './admin.service';
+import { ContentModule } from '../content/content.module';
+import { MenuService } from '../bot/menu.service';
+
+@Module({
+  imports: [ContentModule],
+  controllers: [AdminController],
+  providers: [AdminService, MenuService],
+})
+export class AdminModule {}
+</file>
+
+<file path="src/admin/admin.service.ts">
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { createHash, randomUUID } from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
+import type { AdminUser } from './interfaces/admin-user.interface';
+
+@Injectable()
+export class AdminService implements OnModuleInit {
+  private readonly logger = new Logger(AdminService.name);
+  private readonly filePath = path.resolve(
+    process.cwd(),
+    'data',
+    'admins.json',
+  );
+  private users: AdminUser[] = [];
+
+  private get salt(): string {
+    return process.env.SESSION_SECRET ?? 'rinh-default-salt';
+  }
+
+  onModuleInit() {
+    this.loadFromDisk();
+  }
+
+  // ── УТИЛИТЫ ──────────────────────────────────────────────────
+  private hash(password: string): string {
+    return createHash('sha256')
+      .update(password + this.salt)
+      .digest('hex');
+  }
+
+  private loadFromDisk(): void {
+    try {
+      fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
+      if (!fs.existsSync(this.filePath)) {
+        fs.writeFileSync(this.filePath, '[]', 'utf-8');
+      }
+      const raw = fs.readFileSync(this.filePath, 'utf-8');
+      this.users = JSON.parse(raw) as AdminUser[];
+      this.logger.log(`Загружено ${this.users.length} администраторов`);
+    } catch (err) {
+      this.logger.error('Ошибка загрузки admins.json:', err);
+      this.users = [];
+    }
+  }
+
+  private saveToDisk(): void {
+    fs.writeFileSync(
+      this.filePath,
+      JSON.stringify(this.users, null, 2),
+      'utf-8',
+    );
+  }
+
+  // ── АУТЕНТИФИКАЦИЯ ────────────────────────────────────────────
+
+  validateSuperAdmin(username: string, password: string): boolean {
+    const envUser = process.env.SUPER_ADMIN_USERNAME ?? 'superadmin';
+    const envPass = process.env.SUPER_ADMIN_PASSWORD ?? 'admin123';
+    return username === envUser && password === envPass;
+  }
+
+  validateAdmin(username: string, password: string): AdminUser | null {
+    const user = this.users.find(
+      (u) => u.username === username && u.role === 'admin',
+    );
+    if (!user) return null;
+    return user.passwordHash === this.hash(password) ? user : null;
+  }
+
+  // ── CRUD ПОЛЬЗОВАТЕЛЕЙ (только для SuperAdmin) ─────────────────
+
+  getAllAdmins(): Omit<AdminUser, 'passwordHash'>[] {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return this.users.map(({ passwordHash: _, ...rest }) => rest);
+  }
+
+  createAdmin(
+    username: string,
+    password: string,
+  ): Omit<AdminUser, 'passwordHash'> {
+    if (!username.trim() || !password.trim()) {
+      throw new Error('Имя пользователя и пароль не могут быть пустыми');
+    }
+    if (this.users.find((u) => u.username === username)) {
+      throw new Error(`Пользователь "${username}" уже существует`);
+    }
+    if (username === (process.env.SUPER_ADMIN_USERNAME ?? 'superadmin')) {
+      throw new Error('Это имя зарезервировано');
+    }
+    const user: AdminUser = {
+      id: randomUUID(),
+      username,
+      passwordHash: this.hash(password),
+      role: 'admin',
+      createdAt: new Date().toISOString(),
+    };
+    this.users.push(user);
+    this.saveToDisk();
+    this.logger.log(`Создан администратор: ${username}`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash: _, ...safe } = user;
+    return safe;
+  }
+
+  deleteAdmin(id: string): void {
+    const idx = this.users.findIndex((u) => u.id === id);
+    if (idx === -1) throw new Error('Пользователь не найден');
+    const removed = this.users[idx];
+    this.users.splice(idx, 1);
+    this.saveToDisk();
+    this.logger.log(`Удалён администратор: ${removed.username}`);
+  }
+
+  changePassword(id: string, newPassword: string): void {
+    const user = this.users.find((u) => u.id === id);
+    if (!user) throw new Error('Пользователь не найден');
+    if (!newPassword.trim()) throw new Error('Пароль не может быть пустым');
+    user.passwordHash = this.hash(newPassword);
+    this.saveToDisk();
+    this.logger.log(`Изменён пароль для: ${user.username}`);
+  }
+}
+</file>
+
+<file path="src/admin/interfaces/admin-user.interface.ts">
+export interface AdminUser {
+  id: string;
+  username: string;
+  passwordHash: string;
+  role: 'admin' | 'superAdmin';
+  createdAt: string;
+}
+</file>
+
+<file path="src/app.controller.spec.ts">
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+describe('AppController', () => {
+  let appController: AppController;
+
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
+      controllers: [AppController],
+      providers: [AppService],
+    }).compile();
+
+    appController = app.get<AppController>(AppController);
+  });
+
+  describe('root', () => {
+    it('should return "Hello World!"', () => {
+      expect(appController.getHello()).toBe('Hello World!');
+    });
+  });
+});
+</file>
+
+<file path="src/app.controller.ts">
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+</file>
+
+<file path="src/app.module.ts">
+import { Module } from '@nestjs/common';
+import { BotModule } from './bot/bot.module';
+import { AdminModule } from './admin/admin.module';
+
+@Module({
+  imports: [BotModule, AdminModule],
+  controllers: [],
+  providers: [],
+})
+export class AppModule {}
+</file>
+
+<file path="src/app.service.ts">
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+</file>
+
+<file path="src/bot/bot.buttons.ts">
+import { Keyboard } from '@maxhub/max-bot-api';
+
+/**
+ * Класс для генерации кнопок бота.
+ * Все методы возвращают массив массивов кнопок (двумерный массив),
+ * который затем передается в Keyboard.inlineKeyboard()
+ */
+export type KeyboardButtons = Parameters<typeof Keyboard.inlineKeyboard>[0];
+export type Button = KeyboardButtons[number][number];
+
+export class BotButtons {
+  /**
+   * УРОВЕНЬ 0: Главное меню
+   */
+  static mainMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('☎️ Контакты', 'menu_contacts')],
+      [Keyboard.button.callback('🏀 Кружки и секции', 'menu_activities')],
+      [
+        Keyboard.button.link(
+          '🕚 Расписание',
+          'https://max.ru/vuz_schedule_bot',
+        ),
+      ],
+      [
+        Keyboard.button.link(
+          '📄 Документы',
+          'https://rsue.ru/sveden/document/',
+        ),
+      ],
+      [Keyboard.button.link('🎪 Мероприятия', 'https://rsue.ru/rasp/')],
+      [Keyboard.button.callback('❓ Задать вопрос', 'menu_ask')],
+    ];
+  }
+
+  /**
+   * УРОВЕНЬ 1: Раздел контактов
+   */
+  static contactsMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('👩🏻‍🎓 Факультеты', 'contacts_faculties')],
+      [Keyboard.button.callback('📈 Кафедры', 'contacts_departments')],
+      [
+        Keyboard.button.callback(
+          '🎓 Институт магистратуры',
+          'contacts_masters',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🧠 Аспирантура и докторантура',
+          'contacts_phd',
+        ),
+      ],
+      [Keyboard.button.callback('🛠️ Службы университета', 'contacts_services')],
+      [Keyboard.button.callback('🏠 Общежития', 'contacts_hostels')],
+      [Keyboard.button.callback('📚 Библиотеки', 'contacts_libraries')],
+      ...this.backToStart(),
+    ];
+  }
+
+  /**
+   * УРОВЕНЬ 2: Выбор факультета для получения общей инфо
+   */
+  static facultyMenu(): KeyboardButtons {
+    return [
+      [
+        Keyboard.button.callback(
+          '🧑🏼‍🏫 Менеджмента и предпринимательства',
+          'fac_management',
+        ),
+      ],
+      [Keyboard.button.callback('🛃 Торгового дела', 'fac_trade')],
+      [Keyboard.button.callback('👩🏻‍💻 КТиИБ', 'fac_it')],
+      [Keyboard.button.callback('🧮 Учетно-экономический', 'fac_accounting')],
+      [Keyboard.button.callback('🤑 Экономики и финансов', 'fac_economics')],
+      [Keyboard.button.callback('🧑🏼‍⚖️ Юридический', 'fac_law')],
+      [
+        Keyboard.button.callback(
+          '📸 Лингвистики и журналистики',
+          'fac_linguistics',
+        ),
+      ],
+      ...this.goBack('menu_contacts'),
+      ...this.backToStart(),
+    ];
+  }
+
+  /**
+   * УРОВЕНЬ 2: Выбор факультета для перехода к списку КАФЕДР
+   */
+  static departmentsMenu(): KeyboardButtons {
+    return [
+      [
+        Keyboard.button.callback(
+          '🧑🏼‍🏫 Менеджмента и предпринимательства',
+          'list_dep_mip',
+        ),
+      ],
+      [Keyboard.button.callback('🛃 Торгового дела', 'list_dep_td')],
+      [Keyboard.button.callback('👩🏻‍💻 Кафедры КТиИБ', 'list_dep_ktib')],
+      [Keyboard.button.callback('🧮 Учетно-экономический', 'list_dep_uef')],
+      [
+        Keyboard.button.callback(
+          '🤑 Кафедры Экономики и финансов',
+          'list_dep_eif',
+        ),
+      ],
+      [Keyboard.button.callback('🧑🏼‍⚖️ Кафедры Юридический', 'list_dep_law')],
+      [
+        Keyboard.button.callback(
+          '📸 Кафедры Лингвистики и журналистики',
+          'list_dep_lizh',
+        ),
+      ],
+      ...this.goBack('menu_contacts'),
+      ...this.backToStart(),
+    ];
+  }
+
+  /**
+   * УРОВЕНЬ 2.5: Списки кафедр по конкретным факультетам
+   */
+  static mipDepartmentsMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('💰 Финансовый и HR менеджмент', 'dep_mip_hr')],
+      [
+        Keyboard.button.callback(
+          '🗺️ Общий и стратегический менеджмент',
+          'dep_mip_strat',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🛡️ ГМУ и экономическая безопасность',
+          'dep_mip_gmu',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '📈 Инновационный менеджмент и предпр.',
+          'dep_mip_innov',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🛠️ Антикризисное и корп. управление',
+          'dep_mip_anticrisis',
+        ),
+      ],
+      ...this.goBack('contacts_departments'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static tdDepartmentsMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('🎭 Философии и культурологии', 'dep_td_phil')],
+      [Keyboard.button.callback('🚚 Коммерции и логистики', 'dep_td_comm')],
+      [Keyboard.button.callback('🎯 Маркетинга и рекламы', 'dep_td_mark')],
+      [
+        Keyboard.button.callback(
+          '🛳️ Международной торговли и тамож. дела',
+          'dep_td_customs',
+        ),
+      ],
+      [Keyboard.button.callback('📊 Экономической теории', 'dep_td_theory')],
+      [
+        Keyboard.button.callback(
+          '🛒 Товароведения и управления качеством',
+          'dep_td_quality',
+        ),
+      ],
+      ...this.goBack('contacts_departments'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static ktibDepartmentsMenu(): KeyboardButtons {
+    return [
+      [
+        Keyboard.button.callback(
+          '💻 Информационных систем и прикл. инф.',
+          'dep_ktib_is',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🧠 Прикл. математики и технологий ИИ',
+          'dep_ktib_ai',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '📱 Инф. технологий и программирования',
+          'dep_ktib_it',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🔐 Информационной безопасности',
+          'dep_ktib_sec',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '⛹️‍♀️ Физ. воспитания, спорта и туризма',
+          'dep_ktib_sport',
+        ),
+      ],
+      ...this.goBack('contacts_departments'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static uefDepartmentsMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('💼 Бухгалтерского учета', 'dep_uef_acc')],
+      [Keyboard.button.callback('🔍 Аудита', 'dep_uef_audit')],
+      [
+        Keyboard.button.callback(
+          '📉 Анализа хоз. деятельности и прогноз.',
+          'dep_uef_analysis',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '📘 Статистики, эконометрики и оценки рисков',
+          'dep_uef_stat',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🌍 Мировой экономики и межд. отношений',
+          'dep_uef_world',
+        ),
+      ],
+      ...this.goBack('contacts_departments'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static eifDepartmentsMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('🏦 Банковского дела', 'dep_eif_bank')],
+      [Keyboard.button.callback('💵 Финансов', 'dep_eif_fin')],
+      [Keyboard.button.callback('📋 Налоги и налогообложение', 'dep_eif_tax')],
+      [
+        Keyboard.button.callback(
+          '📊 Фин. мониторинга и фин. рынков',
+          'dep_eif_monit',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🏭 Экономики региона, отраслей и предпр.',
+          'dep_eif_reg',
+        ),
+      ],
+      ...this.goBack('contacts_departments'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static lawDepartmentsMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('📜 Гражданского права', 'dep_law_civ')],
+      [
+        Keyboard.button.callback(
+          '🌍 Исторических наук и политологии',
+          'dep_law_hist',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🏛️ Конституционного и муниц. права',
+          'dep_law_const',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🔍 Судебной экспертизы и криминалистики',
+          'dep_law_crim_exp',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '📚 Теории и истории государства и права',
+          'dep_law_theory',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🚔 Уголовного права и криминологии',
+          'dep_law_crim',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '📓 Финансового и админ. права',
+          'dep_law_fin',
+        ),
+      ],
+      [Keyboard.button.callback('🧑‍⚖️ Процессуального права', 'dep_law_proc')],
+      ...this.goBack('contacts_departments'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static lizhDepartmentsMenu(): KeyboardButtons {
+    return [
+      [
+        Keyboard.button.callback(
+          '🌍 Ин. языков для эконом. специальностей',
+          'dep_lizh_econ',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🗣️ Ин. языков для гуман. специальностей',
+          'dep_lizh_hum',
+        ),
+      ],
+      [Keyboard.button.callback('📸 Журналистики', 'dep_lizh_journ')],
+      [
+        Keyboard.button.callback(
+          '👥 Лингвистики и межкультурной комм.',
+          'dep_lizh_ling',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '📖 Русского языка и культуры речи',
+          'dep_lizh_rus',
+        ),
+      ],
+      ...this.goBack('contacts_departments'),
+      ...this.backToStart(),
+    ];
+  }
+
+  /**
+   * ДРУГИЕ РАЗДЕЛЫ
+   */
+  static universityServicesMenu(): KeyboardButtons {
+    return [
+      [
+        Keyboard.button.callback(
+          '💳 Управление бухгалтерского и налогового учета',
+          'srv_accounting',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '👩‍💼 Управление по работе с персоналом и кадровой политике',
+          'srv_hr',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '👩‍🏫 Управление по работе с абитуриентами и развитию карьеры',
+          'srv_admission',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '🌏 Управление международного сотрудничества',
+          'srv_ic',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '👪 Управление по воспитательной работе и поддержке студенческих инициатив',
+          'srv_education',
+        ),
+      ],
+      [
+        Keyboard.button.callback(
+          '💡 Центр проектной деятельности',
+          'srv_projects',
+        ),
+      ],
+      [Keyboard.button.callback('🗂️ Студенческое бюро', 'srv_student_bureau')],
+      [
+        Keyboard.button.callback(
+          '🛃 Профсоюзный комитет обучающихся',
+          'srv_student_trade',
+        ),
+      ],
+      ...this.goBack('menu_contacts'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static libraryMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('📚 Абонементы', 'lib_subscriptions')],
+      [Keyboard.button.callback('📖 Читальные залы', 'lib_reading_rooms')],
+      [Keyboard.button.callback('💻 Электронный зал', 'lib_e_reading_rooms')],
+      //ДОДЕЛАТЬ
+      [
+        Keyboard.button.callback(
+          '🌐 Образовательные ресурсы',
+          'lib_e_education_resources',
+        ),
+      ],
+
+      ...this.goBack('menu_contacts'),
+      ...this.backToStart(),
+    ];
+  }
+
+  static sectionsMenu(): KeyboardButtons {
+    return [
+      [Keyboard.button.callback('🏀 Спортивные секции', 'sec_sport')],
+      [Keyboard.button.callback('🎸 Творческие кружки', 'sec_creative')],
+      [Keyboard.button.callback('🎓 Научные конференции', 'sec_science')],
+      [
+        Keyboard.button.link(
+          '👩‍🏫 Штаб студенческих отрядов (VK)',
+          'https://vk.com/rso_rsue',
+        ),
+      ],
+      [Keyboard.button.callback('🇷🇺 Патриотический центр', 'sec_patriot')],
+      ...this.backToStart(),
+    ];
+  }
+
+  /**
+   * ХЕЛПЕРЫ НАВИГАЦИИ
+   */
+  static goBack(callback: string): KeyboardButtons {
+    return [[Keyboard.button.callback('↩️ Назад', callback)]];
+  }
+
+  static backToStart(): KeyboardButtons {
+    return [[Keyboard.button.callback('⬅️ В начало', 'nav_start')]];
+  }
+}
+</file>
+
+<file path="src/bot/bot.content.ts">
+// src/bot/bot.content.ts
+
+export const BotContent = {
+  // --- ФАКУЛЬТЕТЫ ---
+  fac_management: `
+📌 **Факультет Менеджмента и предпринимательства (МиП) 📚**
+
+👤 **Декан факультета:** д.э.н., профессор Суржиков Михаил Андреевич 
+🏘️ **Адрес:** г. Ростов-на-Дону, пер. Островского, 62, кабинет 200 
+
+**Контактные телефоны:**
+📞 **Очный деканат:** +7 (863) 267-39-67 
+📞 **Заочный деканат:** +7 (863) 267-40-61 
+
+**Электронная почта:**
+✉️ **Email:** dekanat.mip@yandex.ru 
+`,
+
+  fac_trade: `
+📌 **Факультет Торгового дела (ТД) 🛍️**
+
+👤 **Декан факультета:** д.э.н., профессор Костоглодов Дмитрий Дмитриевич 
+
+🏙️ **Адрес:** г. Ростов-на-Дону, ул. Б. Садовая, 69, кабинет 319 
+
+**Контактный телефон:**
+📞 +7 (863) 263-22-83 
+`,
+
+  fac_it: `
+📌 **Факультет Компьютерных технологий и информационной безопасности (КТиИБ) 💻⚡**
+
+👤 **Декан факультета:** д.э.н., профессор, Тищенко Евгений Николаевич 
+
+🏙️ **Адрес:** г. Ростов-на-Дону, ул. Б. Садовая, 69, кабинет 305а 
+
+**Контактный телефон:**
+📞 +7 (863) 261-38-64 
+`,
+
+  fac_accounting: `
+📌 **Учетно-экономический факультет (УЭФ) 📊**
+
+👤 **Декан факультета:** к.э.н., доцент, Андреева Ольга Валентиновна 
+
+🏙️ **Адрес:** г. Ростов-на-Дону, ул. Б. Садовая, 69, кабинет 506 
+
+**Контактный телефон:**
+📞 +7 (863) 240-57-29 
+`,
+
+  fac_economics: `
+📌 **Факультет Экономики и финансов (ЭиФ) 💰**
+
+👤 **Декан факультета:** д.э.н., профессор Джуха Владимир Михайлович 
+
+🏙️ **Адрес:** г. Ростов-на-Дону, ул. Б. Садовая, 69, кабинет 420 
+
+**Контактный телефон:**
+📞 +7 (863) 263-11-85 
+`,
+
+  fac_law: `
+📌 **Юридический факультет (ЮФ) ✔️**
+
+👤 **Декан факультета:** д.ю.н., профессор Позднышов Алексей Николаевич 
+
+🏙️ **Адрес:** г. Ростов-на-Дону, ул. М. Горького, 166, кабинет 213 
+
+**Контактный телефон:**
+📞 +7 (863) 263-84-14 
+`,
+
+  fac_linguistics: `
+📌 **Факультет Лингвистики и журналистики (ЛиЖ) 🎤 📖**
+
+👤 **Декан факультета:** кандидат искусствоведения, доцент Усенко Наталия Михайловна 
+
+🏙️ **Адрес:** г. Ростов-на-Дону, ул. Тургеневская, 49, кабинет 407 
+
+**Контактный телефон:**
+📞 +7 (863) 240-34-71 
+`,
+
+  // --- КАФЕДРЫ: МиП ---
+  dep_mip_hr: `
+📚 **Кафедра Финансовый и HR менеджмент**
+
+✨ **Заведующая:** д.э.н., доцент Усенко Анастасия Михайловна 
+
+📅 **Прием:** Понедельник, 12.00-14.00 
+
+🏢 **Адрес:** г. Ростов-на-Дону, пер. Островского, 62, кабинет 205 
+
+📞 **Телефон:** (863) 267-18-81 
+
+✉️ **Email:** fm_hr@mail.ru 
+
+🌐 **VK:** https://vk.com/fm_hr.rsue 
+`,
+  dep_mip_strat: `
+📚 **Кафедра Общего и стратегического менеджмента**
+
+✨ **Заведующая:** к.э.н., доцент Гончарова Светлана Николаевна 
+
+📅 **Работа:** Пн–Пт 8.30–17.00, Сб 9.00–13.00 
+
+🏢 **Адрес:** г. Ростов-на-Дону, пер. Островского, 62, кабинет 306
+
+📞 **Телефон:** (863) 269-50-44 
+
+✉️ **Email:** osm.mip@mail.ru 
+
+✈️ **TG:** t.me/oism_rsue 
+`,
+  dep_mip_gmu: `
+📚 **Кафедра ГМУ и экономической безопасности**
+
+✨ **Заведующий:** д.э.н., профессор Украинцев Вадим Борисович 
+
+🏢 **Адрес:** пер. Островского, 62, каб. 306 
+
+📞 **Телефон:** +7 (863) 269-50-53 
+
+✉️ **Email:** rsue.spmes@bk.ru 
+`,
+  dep_mip_innov: `
+📚 **Кафедра Инновационного менеджмента и предпринимательства**
+
+✨ **И.о. заведующего кафедрой:** к.э.н., доцент Михненко Татьяна Николаевна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, пер. Островского, 62, кабинет 301 
+
+📞 **Телефон:** (863) 227-16-12 
+
+✉️ **Email:** kafimip@yandex.ru 
+`,
+  dep_mip_anticrisis: `
+📚 **Кафедра Антикризисного и корпоративного управления**
+
+✨ **И.о. заведующего кафедрой, заместитель декана по научной работе:** к.э.н., доцент Синюк Татьяна Юрьевна 
+
+📅 **Работа:** Пн–Пт, 10:00–16:00 
+
+🏢 **Адрес:** г. Ростов-на-Дону, пер. Островского, 62, аудитория 206 
+
+📞 **Телефон:** +7 (863) 269-51-30 
+
+✉️ **Email:** t_sinyuk@mail.ru 
+`,
+
+  // --- КАФЕДРЫ: ТД ---
+  dep_td_phil: `
+📚 **Кафедра Философии и культурологии**
+
+✨ **Заведующая кафедрой:** к.ф.н., доцент Штофер Людмила Львовна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 327 
+
+📞 **Телефон:** +7 (863) 261-38-14 
+
+✉️ **Email:** filosofiya327@yandex.ru 
+`,
+  dep_td_comm: `
+📚 **Кафедра Коммерции и логистики**
+
+✨ **Заведующая:** д.э.н., профессор Полуботко Анна Александровна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 325 
+
+📞 **Телефон:** (863) 240-73-38 
+
+✉️ **Email:** kafedra_kil@mail.ru 
+`,
+  dep_td_mark: `
+📚 **Кафедра Маркетинга и рекламы**
+
+✨ **Заведующая кафедрой:** д.э.н., профессор Пржедецкая Наталия Витовна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 333 
+
+📞 **Телефон:** (863) 237-02-55 
+
+✉️ **Email:** kafedra_mirddk@mail.ru 
+`,
+  dep_td_customs: `
+📚 **Кафедра Международной торговли и таможенного дела**
+
+✨ **Заведующая кафедрой:** к.э.н., доцент Соленая Светлана Валентиновна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 340 
+
+📞 **Телефон:** +7 (863) 240-53-50 
+
+✉️ **Email:** kmtitd@yandex.ru 
+`,
+  dep_td_theory: `
+📚 **Кафедра Экономической теории**
+
+✨ **Заведующий кафедрой:** д.э.н., профессор Кузнецов Николай Геннадьевич 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 332 
+
+📞 **Телефон:** +7 (863) 261-38-83 
+
+✉️ **Email:** kafedra332@mail.ru 
+`,
+  dep_td_quality: `
+📚 **Кафедра Товароведения и управления качеством**
+
+✨ **Заведующая кафедрой:** д.э.н., доцент Механцева Карина Феликсовна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 318 
+
+📞 **Телефон:** (863) 240-58-40 
+
+✉️ **Email:** kafedratovqm@mail.ru 
+
+🌐 **VK:** https://vk.com/tiyk_rsue 
+`,
+
+  // --- КАФЕДРЫ: КТиИБ ---
+  dep_ktib_is: `
+📚 **Кафедра Информационных систем и прикладной информатики**
+
+✨ **Заведующий кафедрой:** д.э.н., профессор Щербаков Сергей Михайлович 
+
+🏡 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 308 
+
+📞 **Телефон:** +7 (863) 237-02-71 
+
+✉️ **Email:** kafedra_ispi@mail.ru 
+`,
+  dep_ktib_ai: `
+🎓 **Кафедра Прикладной математики и технологий искусственного интеллекта**
+
+✨ **Заведующая кафедрой:** д.э.н., Чернышева Юлия Гарьевна 
+
+⏳ **Прием:** Вт, Ср, Чт 12.00 – 15.00 
+
+📅 **Режим:** Пн–Пт 08.30–16.30, Сб 09.00–14.00 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 525 
+
+📞 **Телефон:** (863) 263-74-60 
+
+✉️ **Email:** kafedra.fipm525@mail.ru 
+
+🌐 **Сайт:** rsue.ru/math 
+`,
+  dep_ktib_it: `
+💻 **Кафедра Информационных технологий и программирования**
+
+✨ **Заведующая кафедрой:** к.э.н., доцент Ефимова Елена Владимировна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 306 
+
+📞 **Телефон:** +7 (863) 240-21-23 
+
+✉️ **Email:** efim19732008@yandex.ru 
+`,
+  dep_ktib_sec: `
+🔐  **Кафедра Информационной безопасности**
+
+✨ **Заведующий кафедрой:** к.э.н., доцент, проректор по развитию образовательных программ и цифровой трансформации Радченко Юрий Владимирович
+
+🏢  **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, кабинет 418
+
+📞  **Телефон:** +7 (863) 261-38-41 (внутр. 8-41)
+
+✉️  **Email:** kafedraib@bk.ru
+`,
+  dep_ktib_sport: `
+🥇  **Спортивные секции**
+
+📍  **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, к. 106
+
+📞  **Телефон:** 8(863) 261-38-71 (8-71 - внутренний)
+
+✉️  **Email:** kafedrafvsit@yandex.ru
+
+🌐  **Сайт:** rsue.ru/fakultety/FKTIB/kaf-FVSIT 
+`,
+
+  // --- КАФЕДРЫ: УЭФ ---
+  dep_uef_acc: `
+📚 **Кафедра Бухгалтерского учета**
+
+✨ **Заведующий кафедрой:** д.э.н., профессор, Почетный работник ВПО РФ, президент Ростовского ТИПБиА, Почетный наставник Минобрнауки России Лабинцев Николай Тихонович 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 509 
+
+📞 **Телефон:** (863) 240-29-86 
+
+✉️ **Email:** RGEUuef509@yandex.ru 
+`,
+  dep_uef_audit: `
+📚 **Кафедра Аудита**
+
+✨ **Заведующий кафедрой:** д.э.н., профессор Кизилов Александр Николаевич 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 526 
+
+📞 **Телефон:** +7 (863) 237-02-56 
+
+✉️ **Email:** audit@rsue.ru 
+
+🌐 **VK:** https://vk.com/public189752489 
+`,
+  dep_uef_analysis: `
+📚 **Кафедра Анализа хозяйственной деятельности и прогнозирования**
+
+✨ **Заведующая кафедрой:** член-корреспондент РАН, научный руководитель РГЭУ (РИНХ), д.э.н., профессор, Заслуженный деятель науки РФ Усенко Людмила Николаевна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 508 
+
+📞 **Телефон:** (863) 261-38-92 
+
+✉️ **Email:** analitik.ahd@mail.ru 
+`,
+  dep_uef_stat: `
+📚 **Кафедра Статистики, эконометрики и оценки рисков**
+
+✨ **Заведующая кафедрой:** д.э.н., профессор Ниворожкина Людмила Ивановна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 504 
+
+📞 **Телефон:** (863) 261-38-65 
+
+✉️ **Email:** kafedra_stat@mail.ru 
+
+🌐 **VK:** https://vk.com/big_data_analytics 
+`,
+  dep_uef_world: `
+📚 **Кафедра мировой экономики и международных отношений**
+
+✨ **Заведующая кафедрой:** к.э.н., доцент Мезинова Инга Александровна 
+
+📅 **Прием:** четверг с 13.00 до 14.30 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, каб. 529 
+
+📞 **Телефон:** +7 (863) 263-25-73 
+
+✉️ **Email:** memo.rsue@mail.ru 
+
+🌐 **VK:** https://vk.com/rsue529 
+`,
+
+  // --- КАФЕДРЫ: ЭиФ ---
+  dep_eif_bank: `
+📚 **Кафедра Банковского дела 💰**
+
+✨ **Заведующая кафедрой:** д.э.н., профессор Семенюта Ольга Гетовна 
+
+⏳ **Прием:** 
+- Вт: 11:00-14:00
+- Ср: 11:00-14:00
+- Пн: 13:30-15:00
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, к. 524 
+
+☎️ **Телефон:** (863) 240-61-78 
+
+✉️ **Email:** bankdelo.rsue@mail.ru 
+
+🌐 **VK:** vk.com/bankdelorsue 
+`,
+  dep_eif_fin: `
+📚 **Кафедра Финансов 💸**
+✨ **Заведующая кафедрой:** д.э.н., профессор Вовченко Наталья Геннадьевна 
+
+⏳ **Прием:** 
+- Пн: 12:00 - 16:00
+- Вт: 11:00 - 15:00
+- Ср: 11:00 - 14:00
+
+🕑 **Режим:**
+- Пн-Пт: 09:00 - 17:00
+- Сб: 09:00 - 14:00 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, к. 425 
+
+☎️ **Телефон:** +7 (863) 263-31-09 
+
+✉️ **Email:** kafedra_finance@mail.ru 
+`,
+  dep_eif_tax: `
+📚 **Кафедра Налоги и налогообложение ☑️**
+
+✨ **Заведующая кафедрой:** д.э.н., профессор Евстафьева Елена Михайловна
+
+⏳ **Прием:**
+Вторник-четверг: 13:30-15:00
+
+🕑 **Режим:** 
+- Пн-Пт: 09:00 - 17:00
+- Сб: 09:00 - 13:00
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, к. 521 
+
+☎️ **Телефон:** +7 (863) 261-38-38 
+
+✉️ **Email:** nalogi521@rsue.ru 
+`,
+  dep_eif_monit: `
+📚 **Кафедра Финансового мониторинга и финансовых рынков 📈**
+
+✨ **Заведующая кафедрой:** д.э.н., профессор Евлахова Юлия Сергеевна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, к. 423 
+
+☎️ **Телефон:** 8 (863) 261-38-46 
+
+✉️ **Email:** finmonitor.rsue@mail.ru 
+`,
+  dep_eif_reg: `
+📚 **Кафедра Экономики региона, отраслей и предприятий 📈**
+
+✨ **Заведующая кафедрой:** к.э.н., доцент Боев Василий Юрьевич 
+
+⏳ **Прием:** Понедельник: 11:30 – 14:00 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, ауд. 531 
+
+☎️ **Телефон:** 8 (863) 240-89-70 
+
+✉️ **Email:** reg.eko@mail.ru 
+`,
+
+  // --- КАФЕДРЫ: ЮФ ---
+  dep_law_civ: `
+📚 **Кафедра Гражданского права**
+
+✨ **Заведующий кафедрой:** к.ю.н., профессор Романенко Николай Гаврилович 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 303 
+
+📞 **Телефон:** +7 (863) 263-57-08 
+
+✉️ **Email:** kafedra37@bk.ru 
+`,
+  dep_law_hist: `
+📚 **Кафедра Исторических наук и политологии**
+
+✨ **Заведующий кафедрой:** д.и.н., профессор Наухацкий Виталий Васильевич 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 209 
+
+📞 **Телефон:** (863) 266-64-33 
+
+✉️ **Email:** istoria30@bk.ru 
+`,
+  dep_law_const: `
+📚 **Кафедра Конституционного и муниципального права**
+
+✨ **Заведующий кафедрой:** Член Высшей квалификационной коллегии судей РФ, почетный работник сферы образования РФ, к.ю.н., доцент, полковник полиции в отставке Баринов Эмиль Эдуардович 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 211 
+
+📞 **Телефон:** +7 (863) 263-84-24 
+
+✉️ **Email:** kafedra.kimp@yandex.ru 
+`,
+  dep_law_crim_exp: `
+📚 **Кафедра Судебной экспертизы и криминалистики**
+
+✨ **Заведующий кафедрой:** к.ю.н., доцент Николаев Александр Викторович 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 304 
+
+📞 **Телефон:** +7 (863) 263-72-39 
+
+✉️ **Email:** procpravo@yandex.ru 
+`,
+  dep_law_theory: `
+📚 **Кафедра теории и истории государства и права**
+
+✨ **Заведующий кафедрой:** к.ю.н., доцент Непранов Руслан Григорьевич 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 104 
+
+📞 **Телефон:** +7 (863) 263-84-21 
+
+✉️ **Email:** teorii.kafedra@yandex.ru 
+`,
+  dep_law_crim: `
+📚 **Кафедра уголовного и уголовно-исполнительного права, криминологии**
+
+✨ **Заведующий кафедрой:** д.ю.н., профессор, заслуженный работник высшего образования Улезько Сергей Иванович 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 404, 212 
+
+📞 **Телефон:** +7 (863) 263-84-20 
+
+✉️ **Email:** ugpravo_crim404@mail.ru 
+`,
+  dep_law_fin: `
+📚 **Кафедра финансового и административного права**
+
+✨ **И.о. заведующей:** к.ю.н., доцент Науменко Анна Михайловна
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 105 
+
+📞 **Телефон:** +7 (863) 266-63-50 
+
+✉️ **Email:** kfiap@yandex.ru 
+`,
+  dep_law_proc: `
+📚 **Кафедра процессуального права**
+
+✨ **Заведующая:** д.соц.н., к.ю.н., профессор Федоренко Наталия Владимировна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Максима Горького, 166, каб. 210 
+
+📞 **Телефон:** +7 (863) 264-55-44 
+
+✉️ **Email:** gr_process38@mail.ru 
+`,
+
+  // --- КАФЕДРЫ: ЛиЖ ---
+  dep_lizh_econ: `
+📚 **Кафедра Иностранных языков для экономических специальностей 🌍**
+
+✨ **И.о. зав. кафедрой:** к.ф.н., доцент Бачиева Рупия Изитдиновна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Тургеневская, 49, к.408 
+
+☎️ **Телефон:** (863) 240-34-72; 237-02-52 
+`,
+  dep_lizh_hum: `
+📚 **Кафедра Иностранных языков для гуманитарных специальностей 🌍**
+
+✨ **Зав. кафедрой:** к.ф.н., доцент Гермашева Татьяна Мартиросовна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Тургеневская, 49, к. 303 
+
+☎️ **Телефон:** (863) 240-35-92 
+
+✉️ **Email:** kafedrags45@mail.ru 
+`,
+  dep_lizh_journ: `
+📚 **Кафедра Журналистики 🖊️**
+
+✨ **Зав. кафедрой:** д.фил.н., профессор Клеменова Елена Николаевна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Тургеневская, 49, к. 506 
+
+☎️ **Телефон:** (863) 240-39-51 
+
+✉️ **Email:** zkafedra255@mail.ru 
+`,
+  dep_lizh_ling: `
+📚 **Кафедра Лингвистики и межкультурной коммуникации 🗣️**
+
+✨ **Зав. кафедрой:** к.фил.н., доцент Барабанова Ирина Геннадьевна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Тургеневская, 49, к. 408 
+
+☎️ **Телефон:** (863) 240-36-58 
+`,
+  dep_lizh_rus: `
+📚 **Кафедра русского языка и культуры речи ✏️**
+
+✨ **Заведующая:** д.филол.н., профессор Куликова Элла Германовна 
+
+🏢 **Адрес:** г. Ростов-на-Дону, ул. Тургеневская, 49, к. 411 
+
+☎️ **Телефон:** 8 (863) 240-35-69 
+
+✉️ **Email:** kulikova_ella21@mail.ru 
+`,
+
+  // --- СЛУЖБЫ ---
+  srv_accounting: `
+📌 **Управление бухгалтерского и налогового учета**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, каб. 219 
+📞 **Телефон:** +7 (863) 263-64-31 
+`,
+  srv_hr: `
+📌 **Управление по работе с персоналом и кадровой политике**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, ауд. 218 
+📞 **Телефон:** +7 (863) 240-17-75 
+📧 **Email:** kadry_rinh@mail.ru 
+`,
+  srv_admission: `
+🎓 **Управление по работе с абитуриентами и развитию карьеры**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Б. Садовая, 69, к.7 (спортивно-оздоровительный комплекс РГЭУ «РИНХ») 
+📞 **Телефон:** 8 (863) 237-02-77 
+📧 **Email:** rabota.rinh@mail.ru 
+`,
+  srv_ic: `
+🌍 **Управление международного сотрудничества**
+
+📍 **Адрес**: г. Ростов-на-Дону, ул. Б.Садовая, 69, ауд. 528
+📞 **Телефон**: +7 (863) 237-02-53
+📧 **Email:** interoffice.rsue@gmail.com
+`,
+  srv_education: `
+🎓 **Управление по воспитательной работе и поддержке студенческих инициатив**
+
+📍  **Адрес**: г. Ростов-на-Дону, ул. Б.Садовая, 69, РГЭУ (РИНХ), к. 331
+📞  **Телефон**: 8 (863) 240-35-50
+📧  **Email**: rinkh_vosp@mail.ru
+
+`,
+  srv_projects: `
+🛠️ **Центр проектной деятельности**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, к.235 
+📧 **Email:** halanskaya_irina@mail.ru 
+`,
+  srv_student_bureau: `
+📌 **Студенческое бюро**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, ком. 414а 
+☎️ **Телефон:** (863) 2-370-266 
+📧 **Email:** studnauka.rsue@yandex.ru 
+`,
+  srv_student_trade: `
+🛃 **Профсоюзный комитет обучающихся**
+
+📍 **Адрес**: г. Ростов-на-Дону, ул. Б. Садовая, 69, каб. 610
+📞 **Телефоны**: 261-38-44, 255-95-56
+📧 **Email**: Tigran-martirosy@mail.ru; profs_rinh@mail.ru
+`,
+
+  // --- БИБЛИОТЕКИ ---
+  lib_subscriptions: `
+  **📚 Отдел обслуживания и хранения фондов библиотеки**
+
+**Абонементы:**
+
+-**Абонемент учебной литературы**
+  **Адрес**: Пер. Островского, 62, ауд. 104
+  **Телефон**: 📞  267-43-83
+
+-**Абонемент научной и художественной литературы. Фонд редких книг**
+  **Адрес**: Ул. Б. Садовая, 69, ауд. 225
+  **Телефон**: 📞  240-36-04 
+`,
+  lib_reading_rooms: `
+**Читальные залы:**
+
+- Читальный зал учебной, научной литературы и периодических изданий
+**Адрес**: Ул. Б. Садовая, 69, ауд. 355 
+
+- Читальный зал юридического факультета
+**Адрес**: Ул. М. Горького, 69, ауд. 101
+**Телефон**: 📞  266-64-52 
+
+- Читальный зал факультета лингвистики и журналистики
+**Адрес**: Ул. Тургеневская, 49 
+`,
+  lib_e_reading_rooms: `
+**💽Отдел электронно-информационных ресурсов и библиографии**
+
+- Электронный читальный зал
+**Адрес**: Ул. Б. Садовая, 69, ауд. 355
+
+- Кабинет научного сотрудника
+**Адрес**: Ул. Б. Садовая, 69, ауд. 454
+**Телефон**: 📞  261-38-34
+`,
+  lib_e_education_resources: `
+**🌐  Доступ к электронным образовательным ресурсам**
+
+Пользователям библиотеки открыт доступ к следующим онлайн-ресурсам:
+
+- Университетская библиотека онлайн 🔗 
+Сайт: http://www.biblioclub.ru
+
+- Айбукс 🔗 
+Сайт: https://ibooks.ru
+
+- Юрайт 🔗 
+Сайт: https://urait.ru
+
+- IPR Smart 🔗 
+Сайт: http://www.iprbookshop.ru
+
+- Book.Ru 🔗 
+Сайт: http://www.book.ru
+`,
+
+  // --- ДОПОЛНИТЕЛЬНО ---
+  contacts_masters: `
+📌 **Институт магистратуры (ИМ) 🎓**
+
+✨ **Директор Института магистратуры:** д.э.н., профессор Иванова Елена Александровна 
+
+🏙️ **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, кабинет 413 
+
+📞 **Телефон:** (863) 240-13-04 (внутр. 5-71)
+
+📧 **Email:** magistratura.rsue@yandex.ru 
+
+🌐 **Сайт:** magistratura.rsue.ru 
+`,
+  contacts_phd: `
+📌 **Отдел аспирантуры и докторантуры** 🧠 
+
+✨ **Начальник отдела аспирантуры и докторантуры**: Грузднева Екатерина Николаевна
+
+⏳ **Часы приема**:
+- Понедельник-четверг: 9:00 - 17:00
+- Пятница: 9:00 - 16:00
+Перерыв: 12:00 - 13:00
+
+🏙️ **Адрес**: г. Ростов-на-Дону, ул. Б. Садовая, 69, аудитория 222
+
+📞**Телефон**: 8 (863) 240-14-53, внутр. 5-27
+
+✉️**Электронная почта**: aspirantura@rsue.ru
+`,
+  contacts_hostels: `
+📌 **Адреса общежитий РГЭУ (РИНХ)** 🏠
+
+- 2-я Краснодарская, 113/1,
+**Телефон**: 📞  224-03-73
+**Заведующая**: Шаколюкова Наталья Дмитриевна
+**Комендант**: Кокорева Елена Валентиновна
+
+- Пер. Гвардейский, 6, 
+**Телефон**: 📞  267-46-88
+**Заведующая**: Авдонина Елена Александровна
+**Комендант**: Кириленко Любовь Николаевна
+
+- Пер. Доломановский, 53, 
+**Телефон**: 📞  267-50-22
+**Заведующая**: Джорбинадзе Татьяна Анатольевна
+`,
+  sec_patriot: `
+⭐ **Центр патриотического воспитания**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Б. Садовая, 69, ауд. 155 
+📞 **Телефон:** 8 (863) 261-38-89 
+`,
+  sec_sport: `
+🥇 **Спортивные секции**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69, к. 106
+📞 **Телефон:** 8(863) 261-38-71 (8-71 - внутренний)
+💬 **Email:** kafedrafvsit@yandex.ru
+🌐 **Сайт:** rsue.ru/fakultety/FKTIB/kaf-FVSIT
+`,
+  sec_creative: `
+🎨 **Творческие кружки**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Б.Садовая, 69 
+📞 **Телефон:** 8(863) 261-38-84 
+📧 **Email:** skc_rinh@mail.ru 
+🌐 **Сайт:** rsue.ru/studentam/vosp-sport/studencheskiy-kulturnyy-tsentr
+`,
+  sec_science: `
+🧑‍🎓 **Научные конференции**
+
+📍 **Адрес:** г. Ростов-на-Дону, ул. Большая Садовая, 69, ком. 414а 
+☎️ **Телефон:** (863) 2-370-266 
+📧 **Email:** studnauka.rsue@yandex.ru 
+`,
+};
+</file>
+
+<file path="src/bot/bot.keyboard.ts">
+import { BotButtons } from './bot.buttons';
+
+interface IMaxButton {
+  text: string;
+  callback_data?: string;
+  url?: string;
+}
+
+export const getMainMenu = (): IMaxButton[][] => {
+  const res = BotButtons.mainMenu();
+  return res;
+};
+</file>
+
+<file path="src/bot/bot.launcher.ts">
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { Bot, Context, Keyboard } from '@maxhub/max-bot-api';
+import { BotService } from './bot.service';
+
+@Injectable()
+export class BotLauncher implements OnModuleInit {
+  private readonly logger = new Logger(BotLauncher.name);
+  private bot: Bot<Context>;
+
+  constructor(private readonly botService: BotService) {
+    const token = process.env.BOT_TOKEN;
+    if (!token) throw new Error('BOT_TOKEN не задан в .env');
+    this.bot = new Bot<Context>(
+      'f9LHodD0cOKNe1V91C1ebG2JOeXTPNNLxh7o0XKrkgqmv74UcyaV7EJe6aDyx5U7tqG14T9VmpikSeqZAV-m',
+    );
+  }
+
+  private async sendWelcome(ctx: Context) {
+    try {
+      const userId = ctx.user?.user_id ? String(ctx.user.user_id) : 'unknown';
+      const userName = ctx.user?.name || ctx.user?.username || 'студент';
+      await this.botService.updateUserActivity(userId);
+
+      const welcomeText = `👋 Привет, ${userName}!\n👨‍🎓 Я чат‑помощник для студентов РГЭУ (РИНХ). Готов помочь!`;
+      const keyboard = this.botService.getMainMenuKeyboard();
+
+      await ctx.reply(welcomeText, {
+        attachments: [Keyboard.inlineKeyboard(keyboard)],
+        format: 'markdown',
+      });
+    } catch (err: unknown) {
+      this.logger.error(
+        `Ошибка приветствия: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  onModuleInit() {
+    this.logger.log('Инициализация МАКС бота...');
+
+    this.bot.use(async (ctx, next) => {
+      this.logger.log(`Обновление: ${ctx.updateType}`);
+      return next();
+    });
+
+    this.bot.command('start', async (ctx) => {
+      await this.sendWelcome(ctx);
+    });
+    this.bot.on('bot_started', async (ctx) => {
+      await this.sendWelcome(ctx);
+    });
+
+    this.bot.action(/.*/, async (ctx) => {
+      try {
+        const userId = ctx.user?.user_id ? String(ctx.user.user_id) : 'unknown';
+        const data = ctx.match ? ctx.match[0] : '';
+        const userName = ctx.user?.name || ctx.user?.username || 'студент';
+        if (!data) return;
+
+        await this.botService.updateUserActivity(userId);
+        const response = this.botService.handleCallback(data, userName);
+
+        await ctx.answerOnCallback({
+          message: {
+            text: response.text,
+            attachments: [
+              Keyboard.inlineKeyboard(
+                response.reply_markup?.inline_keyboard || [],
+              ),
+            ],
+            format: 'markdown',
+          },
+        });
+      } catch (err: unknown) {
+        this.logger.error(
+          `Ошибка action: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    });
+
+    this.bot
+      .start()
+      .then(() => this.logger.log('Бот запущен'))
+      .catch((err: unknown) =>
+        this.logger.error(`Ошибка запуска: ${String(err)}`),
+      );
+  }
+}
+</file>
+
+<file path="src/bot/bot.module.ts">
+import { Module } from '@nestjs/common';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { BotService } from './bot.service';
+import { BotLauncher } from './bot.launcher';
+import { ContentModule } from '../content/content.module';
+import { MenuService } from './menu.service';
+
+@Module({
+  imports: [
+    RedisModule.forRoot({
+      type: 'single',
+      url: 'redis://localhost:6379',
+    }),
+    ContentModule,
+  ],
+  providers: [BotService, BotLauncher, MenuService],
+  exports: [MenuService],
+})
+export class BotModule {}
+</file>
+
+<file path="src/bot/bot.service.ts">
+import { Injectable } from '@nestjs/common';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import { Redis } from 'ioredis';
+import { Keyboard } from '@maxhub/max-bot-api';
+import type { KeyboardButtons } from './bot.buttons';
+import { ContentService } from '../content/content.service';
+import { MenuService } from './menu.service';
+
+interface BotResponse {
+  text: string;
+  reply_markup: { inline_keyboard: KeyboardButtons };
+}
+
+@Injectable()
+export class BotService {
+  constructor(
+    @InjectRedis() private readonly redis: Redis,
+    private readonly contentService: ContentService,
+    private readonly menuService: MenuService,
+  ) {}
+
+  async updateUserActivity(userId: string): Promise<void> {
+    await this.redis.setex(`user:${userId}:status`, 120, 'active');
+  }
+
+  handleCallback(data: string, userName = 'студент'): BotResponse {
+    const startMenu = this.menuService.getMenu('main');
+    const welcomeText =
+      startMenu?.text.replace('Добро пожаловать!', `Привет, ${userName}!`) ??
+      `👋 Привет, ${userName}!`;
+
+    // Главное меню / В начало
+    if (data === 'nav_start' || data === 'main') {
+      return this.buildMenuResponse('main', welcomeText);
+    }
+
+    // Проверяем — есть ли меню с таким ID
+    const menu = this.menuService.getMenu(data);
+    if (menu) {
+      return this.buildMenuResponse(data, menu.text);
+    }
+
+    // Проверяем контент
+    const content = this.contentService.get(data);
+    if (content) {
+      const parentMenuId = this.menuService.findParentMenuId(data) ?? 'main';
+      return {
+        text: content,
+        reply_markup: {
+          inline_keyboard: [
+            [Keyboard.button.callback('↩️ Назад', parentMenuId)],
+            [Keyboard.button.callback('⬅️ В начало', 'nav_start')],
+          ],
+        },
+      };
+    }
+
+    // Fallback
+    return {
+      text: 'Упс! Информация по этому разделу ещё наполняется.',
+      reply_markup: {
+        inline_keyboard: [
+          [Keyboard.button.callback('⬅️ В начало', 'nav_start')],
+        ],
+      },
+    };
+  }
+
+  private buildMenuResponse(menuId: string, text: string): BotResponse {
+    const menu = this.menuService.getMenu(menuId);
+    if (!menu) return this.handleCallback('nav_start');
+
+    const rows: KeyboardButtons = menu.buttons.map((btn) => {
+      if (btn.type === 'url') {
+        return [Keyboard.button.link(btn.label, btn.value)];
+      }
+      return [Keyboard.button.callback(btn.label, btn.value)];
+    });
+
+    // Добавляем кнопку "Назад" если есть родитель
+    if (menu.parent) {
+      rows.push([Keyboard.button.callback('↩️ Назад', menu.parent)]);
+    }
+    if (menuId !== 'main') {
+      rows.push([Keyboard.button.callback('⬅️ В начало', 'nav_start')]);
+    }
+
+    return { text, reply_markup: { inline_keyboard: rows } };
+  }
+
+  // Для приветствия в bot.launcher.ts
+  getMainMenuKeyboard(): KeyboardButtons {
+    const menu = this.menuService.getMenu('main');
+    if (!menu) return [[Keyboard.button.callback('⬅️ В начало', 'nav_start')]];
+    return menu.buttons.map((btn) =>
+      btn.type === 'url'
+        ? [Keyboard.button.link(btn.label, btn.value)]
+        : [Keyboard.button.callback(btn.label, btn.value)],
+    );
+  }
+}
+</file>
+
+<file path="src/bot/menu.service.ts">
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+import { randomUUID } from 'crypto';
+
+export interface MenuButton {
+  id: string; // уникальный идентификатор кнопки
+  label: string; // текст на кнопке (с эмодзи)
+  type: 'callback' | 'url';
+  value: string; // callback_data или URL
+}
+
+export interface MenuItem {
+  text: string; // текст над кнопками
+  parent: string | null; // ID родительского меню (для кнопки "Назад")
+  buttons: MenuButton[];
+}
+
+export type MenuMap = Record<string, MenuItem>;
+
+@Injectable()
+export class MenuService implements OnModuleInit {
+  private readonly logger = new Logger(MenuService.name);
+  private readonly filePath = path.resolve(process.cwd(), 'data', 'menus.json');
+  private menus: MenuMap = {};
+
+  onModuleInit() {
+    this.loadFromDisk();
+  }
+
+  private loadFromDisk(): void {
+    try {
+      fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
+      if (!fs.existsSync(this.filePath)) {
+        fs.writeFileSync(
+          this.filePath,
+          JSON.stringify(this.getDefaultMenus(), null, 2),
+          'utf-8',
+        );
+        this.logger.log('menus.json создан с дефолтными меню');
+      }
+      const raw = fs.readFileSync(this.filePath, 'utf-8');
+      this.menus = JSON.parse(raw) as MenuMap;
+      this.logger.log(`Меню загружены: ${Object.keys(this.menus).length} шт.`);
+    } catch (err) {
+      this.logger.error('Ошибка загрузки menus.json:', err);
+      this.menus = this.getDefaultMenus();
+    }
+  }
+
+  private saveToDisk(): void {
+    fs.writeFileSync(
+      this.filePath,
+      JSON.stringify(this.menus, null, 2),
+      'utf-8',
+    );
+  }
+
+  // ── ЧТЕНИЕ ────────────────────────────────────────────────────
+
+  getAll(): MenuMap {
+    return { ...this.menus };
+  }
+
+  getMenu(id: string): MenuItem | null {
+    return this.menus[id] ?? null;
+  }
+
+  /** Ищет родительское меню для кнопки с указанным value */
+  findParentMenuId(callbackValue: string): string | null {
+    for (const [menuId, menu] of Object.entries(this.menus)) {
+      if (menu.buttons.some((b) => b.value === callbackValue)) {
+        return menuId;
+      }
+    }
+    return null;
+  }
+
+  // ── МЕНЮ ──────────────────────────────────────────────────────
+
+  updateMenuText(menuId: string, text: string): void {
+    if (!this.menus[menuId]) throw new Error(`Меню "${menuId}" не найдено`);
+    this.menus[menuId].text = text;
+    this.saveToDisk();
+  }
+
+  addMenu(id: string, text: string, parent: string | null): void {
+    if (this.menus[id]) throw new Error(`Меню "${id}" уже существует`);
+    this.menus[id] = { text, parent, buttons: [] };
+    this.saveToDisk();
+  }
+
+  deleteMenu(id: string): void {
+    if (!this.menus[id]) throw new Error(`Меню "${id}" не найдено`);
+    delete this.menus[id];
+    // Удаляем кнопки из других меню, которые ссылались на это меню
+    for (const menu of Object.values(this.menus)) {
+      menu.buttons = menu.buttons.filter((b) => b.value !== id);
+    }
+    this.saveToDisk();
+  }
+
+  // ── КНОПКИ ────────────────────────────────────────────────────
+
+  addButton(
+    menuId: string,
+    label: string,
+    type: 'callback' | 'url',
+    value: string,
+  ): MenuButton {
+    if (!this.menus[menuId]) throw new Error(`Меню "${menuId}" не найдено`);
+    const btn: MenuButton = { id: randomUUID(), label, type, value };
+    this.menus[menuId].buttons.push(btn);
+    this.saveToDisk();
+    return btn;
+  }
+
+  updateButton(
+    menuId: string,
+    btnId: string,
+    label: string,
+    type: 'callback' | 'url',
+    value: string,
+  ): void {
+    const menu = this.menus[menuId];
+    if (!menu) throw new Error(`Меню "${menuId}" не найдено`);
+    const btn = menu.buttons.find((b) => b.id === btnId);
+    if (!btn) throw new Error(`Кнопка "${btnId}" не найдена`);
+    btn.label = label;
+    btn.type = type;
+    btn.value = value;
+    this.saveToDisk();
+  }
+
+  deleteButton(menuId: string, btnId: string): void {
+    const menu = this.menus[menuId];
+    if (!menu) throw new Error(`Меню "${menuId}" не найдено`);
+    menu.buttons = menu.buttons.filter((b) => b.id !== btnId);
+    this.saveToDisk();
+  }
+
+  moveButton(menuId: string, btnId: string, direction: 'up' | 'down'): void {
+    const menu = this.menus[menuId];
+    if (!menu) return;
+    const idx = menu.buttons.findIndex((b) => b.id === btnId);
+    if (idx === -1) return;
+    const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (newIdx < 0 || newIdx >= menu.buttons.length) return;
+    [menu.buttons[idx], menu.buttons[newIdx]] = [
+      menu.buttons[newIdx],
+      menu.buttons[idx],
+    ];
+    this.saveToDisk();
+  }
+
+  // ── ДЕФОЛТНЫЕ МЕНЮ (миграция из bot.buttons.ts) ───────────────
+  private getDefaultMenus(): MenuMap {
+    return {
+      main: {
+        text: '👋 Добро пожаловать! Выберите нужный раздел:',
+        parent: null,
+        buttons: [
+          {
+            id: 'b1',
+            label: '☎️ Контакты',
+            type: 'callback',
+            value: 'menu_contacts',
+          },
+          {
+            id: 'b2',
+            label: '🏀 Кружки и секции',
+            type: 'callback',
+            value: 'menu_activities',
+          },
+          {
+            id: 'b3',
+            label: '🕚 Расписание',
+            type: 'url',
+            value: 'https://max.ru/vuz_schedule_bot',
+          },
+          {
+            id: 'b4',
+            label: '📄 Документы',
+            type: 'url',
+            value: 'https://rsue.ru/sveden/document/',
+          },
+          {
+            id: 'b5',
+            label: '🎪 Мероприятия',
+            type: 'url',
+            value: 'https://rsue.ru/rasp/',
+          },
+          {
+            id: 'b6',
+            label: '❓ Задать вопрос',
+            type: 'callback',
+            value: 'menu_ask',
+          },
+        ],
+      },
+      menu_contacts: {
+        text: 'Выберите категорию контактов:',
+        parent: 'main',
+        buttons: [
+          {
+            id: 'c1',
+            label: '👩🏻‍🎓 Факультеты',
+            type: 'callback',
+            value: 'contacts_faculties',
+          },
+          {
+            id: 'c2',
+            label: '📈 Кафедры',
+            type: 'callback',
+            value: 'contacts_departments',
+          },
+          {
+            id: 'c3',
+            label: '🎓 Институт магистратуры',
+            type: 'callback',
+            value: 'contacts_masters',
+          },
+          {
+            id: 'c4',
+            label: '🧠 Аспирантура и докторантура',
+            type: 'callback',
+            value: 'contacts_phd',
+          },
+          {
+            id: 'c5',
+            label: '🛠️ Службы университета',
+            type: 'callback',
+            value: 'contacts_services',
+          },
+          {
+            id: 'c6',
+            label: '🏠 Общежития',
+            type: 'callback',
+            value: 'contacts_hostels',
+          },
+          {
+            id: 'c7',
+            label: '📚 Библиотеки',
+            type: 'callback',
+            value: 'contacts_libraries',
+          },
+        ],
+      },
+      contacts_faculties: {
+        text: 'Выберите факультет:',
+        parent: 'menu_contacts',
+        buttons: [
+          {
+            id: 'f1',
+            label: '🧑🏼‍🏫 Менеджмента и предпринимательства',
+            type: 'callback',
+            value: 'fac_management',
+          },
+          {
+            id: 'f2',
+            label: '🛃 Торгового дела',
+            type: 'callback',
+            value: 'fac_trade',
+          },
+          { id: 'f3', label: '👩🏻‍💻 КТиИБ', type: 'callback', value: 'fac_it' },
+          {
+            id: 'f4',
+            label: '🧮 Учетно-экономический',
+            type: 'callback',
+            value: 'fac_accounting',
+          },
+          {
+            id: 'f5',
+            label: '🤑 Экономики и финансов',
+            type: 'callback',
+            value: 'fac_economics',
+          },
+          {
+            id: 'f6',
+            label: '🧑🏼‍⚖️ Юридический',
+            type: 'callback',
+            value: 'fac_law',
+          },
+          {
+            id: 'f7',
+            label: '📸 Лингвистики и журналистики',
+            type: 'callback',
+            value: 'fac_linguistics',
+          },
+        ],
+      },
+      contacts_departments: {
+        text: 'Выберите факультет, чтобы увидеть список его кафедр:',
+        parent: 'menu_contacts',
+        buttons: [
+          {
+            id: 'd1',
+            label: '🧑🏼‍🏫 МиП',
+            type: 'callback',
+            value: 'list_dep_mip',
+          },
+          {
+            id: 'd2',
+            label: '🛃 Торгового дела',
+            type: 'callback',
+            value: 'list_dep_td',
+          },
+          {
+            id: 'd3',
+            label: '👩🏻‍💻 КТиИБ',
+            type: 'callback',
+            value: 'list_dep_ktib',
+          },
+          {
+            id: 'd4',
+            label: '🧮 УЭФ',
+            type: 'callback',
+            value: 'list_dep_uef',
+          },
+          {
+            id: 'd5',
+            label: '🤑 ЭиФ',
+            type: 'callback',
+            value: 'list_dep_eif',
+          },
+          {
+            id: 'd6',
+            label: '🧑🏼‍⚖️ Юридический',
+            type: 'callback',
+            value: 'list_dep_law',
+          },
+          {
+            id: 'd7',
+            label: '📸 ЛиЖ',
+            type: 'callback',
+            value: 'list_dep_lizh',
+          },
+        ],
+      },
+      list_dep_mip: {
+        text: 'Кафедры факультета МиП:',
+        parent: 'contacts_departments',
+        buttons: [
+          {
+            id: 'mip1',
+            label: '💼 Финансовый и HR менеджмент',
+            type: 'callback',
+            value: 'dep_mip_hr',
+          },
+          {
+            id: 'mip2',
+            label: '📊 Общий и стратегический менеджмент',
+            type: 'callback',
+            value: 'dep_mip_strat',
+          },
+          {
+            id: 'mip3',
+            label: '🏛️ ГМУ и экономическая безопасность',
+            type: 'callback',
+            value: 'dep_mip_gmu',
+          },
+          {
+            id: 'mip4',
+            label: '💡 Инновационный менеджмент',
+            type: 'callback',
+            value: 'dep_mip_innov',
+          },
+          {
+            id: 'mip5',
+            label: '⚡ Антикризисное и корп. управление',
+            type: 'callback',
+            value: 'dep_mip_anticrisis',
+          },
+        ],
+      },
+      list_dep_td: {
+        text: 'Кафедры факультета Торгового дела:',
+        parent: 'contacts_departments',
+        buttons: [
+          {
+            id: 'td1',
+            label: '🧠 Философия и культурология',
+            type: 'callback',
+            value: 'dep_td_phil',
+          },
+          {
+            id: 'td2',
+            label: '🚚 Коммерция и логистика',
+            type: 'callback',
+            value: 'dep_td_comm',
+          },
+          {
+            id: 'td3',
+            label: '📢 Маркетинг и реклама',
+            type: 'callback',
+            value: 'dep_td_mark',
+          },
+          {
+            id: 'td4',
+            label: '🌍 Международная торговля и таможня',
+            type: 'callback',
+            value: 'dep_td_customs',
+          },
+          {
+            id: 'td5',
+            label: '📉 Экономическая теория',
+            type: 'callback',
+            value: 'dep_td_theory',
+          },
+          {
+            id: 'td6',
+            label: '🏷️ Товароведение и управление качеством',
+            type: 'callback',
+            value: 'dep_td_quality',
+          },
+        ],
+      },
+      list_dep_ktib: {
+        text: 'Кафедры факультета КТиИБ:',
+        parent: 'contacts_departments',
+        buttons: [
+          {
+            id: 'ktib1',
+            label: '💻 Информационные системы и прикл. инф.',
+            type: 'callback',
+            value: 'dep_ktib_is',
+          },
+          {
+            id: 'ktib2',
+            label: '🧠 Прикл. математика и технологии ИИ',
+            type: 'callback',
+            value: 'dep_ktib_ai',
+          },
+          {
+            id: 'ktib3',
+            label: '📱 Информационные технологии и прогр.',
+            type: 'callback',
+            value: 'dep_ktib_it',
+          },
+          {
+            id: 'ktib4',
+            label: '🔐 Информационная безопасность',
+            type: 'callback',
+            value: 'dep_ktib_sec',
+          },
+          {
+            id: 'ktib5',
+            label: '⛹️ Физвоспитание и спорт',
+            type: 'callback',
+            value: 'dep_ktib_sport',
+          },
+        ],
+      },
+      list_dep_uef: {
+        text: 'Кафедры УЭФ:',
+        parent: 'contacts_departments',
+        buttons: [
+          {
+            id: 'uef1',
+            label: '💼 Бухгалтерский учёт',
+            type: 'callback',
+            value: 'dep_uef_acc',
+          },
+          {
+            id: 'uef2',
+            label: '🔍 Аудит',
+            type: 'callback',
+            value: 'dep_uef_audit',
+          },
+          {
+            id: 'uef3',
+            label: '📉 Анализ хоз. деятельности',
+            type: 'callback',
+            value: 'dep_uef_analysis',
+          },
+          {
+            id: 'uef4',
+            label: '📊 Статистика и эконометрика',
+            type: 'callback',
+            value: 'dep_uef_stat',
+          },
+          {
+            id: 'uef5',
+            label: '🌍 Мировая экономика и межд. отношения',
+            type: 'callback',
+            value: 'dep_uef_world',
+          },
+        ],
+      },
+      list_dep_eif: {
+        text: 'Кафедры ЭиФ:',
+        parent: 'contacts_departments',
+        buttons: [
+          {
+            id: 'eif1',
+            label: '🏦 Банковское дело',
+            type: 'callback',
+            value: 'dep_eif_bank',
+          },
+          {
+            id: 'eif2',
+            label: '💵 Финансы',
+            type: 'callback',
+            value: 'dep_eif_fin',
+          },
+          {
+            id: 'eif3',
+            label: '📋 Налоги и налогообложение',
+            type: 'callback',
+            value: 'dep_eif_tax',
+          },
+          {
+            id: 'eif4',
+            label: '📊 Финансовый мониторинг',
+            type: 'callback',
+            value: 'dep_eif_monit',
+          },
+          {
+            id: 'eif5',
+            label: '🏭 Экономика региона, отраслей и предпр.',
+            type: 'callback',
+            value: 'dep_eif_reg',
+          },
+        ],
+      },
+      list_dep_law: {
+        text: 'Кафедры Юридического факультета:',
+        parent: 'contacts_departments',
+        buttons: [
+          {
+            id: 'law1',
+            label: '📜 Гражданское право',
+            type: 'callback',
+            value: 'dep_law_civ',
+          },
+          {
+            id: 'law2',
+            label: '🌍 Исторические науки и политология',
+            type: 'callback',
+            value: 'dep_law_hist',
+          },
+          {
+            id: 'law3',
+            label: '🏛️ Конституционное и муниципальное право',
+            type: 'callback',
+            value: 'dep_law_const',
+          },
+          {
+            id: 'law4',
+            label: '🔍 Судебная экспертиза и криминалистика',
+            type: 'callback',
+            value: 'dep_law_crim_exp',
+          },
+          {
+            id: 'law5',
+            label: '📚 Теория и история государства и права',
+            type: 'callback',
+            value: 'dep_law_theory',
+          },
+          {
+            id: 'law6',
+            label: '🚔 Уголовное право и криминология',
+            type: 'callback',
+            value: 'dep_law_crim',
+          },
+          {
+            id: 'law7',
+            label: '📓 Финансовое и административное право',
+            type: 'callback',
+            value: 'dep_law_fin',
+          },
+          {
+            id: 'law8',
+            label: '🧑‍⚖️ Процессуальное право',
+            type: 'callback',
+            value: 'dep_law_proc',
+          },
+        ],
+      },
+      list_dep_lizh: {
+        text: 'Кафедры ЛиЖ:',
+        parent: 'contacts_departments',
+        buttons: [
+          {
+            id: 'lizh1',
+            label: '🌍 Ин. языки для экон. специальностей',
+            type: 'callback',
+            value: 'dep_lizh_econ',
+          },
+          {
+            id: 'lizh2',
+            label: '🗣️ Ин. языки для гум. специальностей',
+            type: 'callback',
+            value: 'dep_lizh_hum',
+          },
+          {
+            id: 'lizh3',
+            label: '📸 Журналистика',
+            type: 'callback',
+            value: 'dep_lizh_journ',
+          },
+          {
+            id: 'lizh4',
+            label: '👥 Лингвистика и межкульт. коммуникация',
+            type: 'callback',
+            value: 'dep_lizh_ling',
+          },
+          {
+            id: 'lizh5',
+            label: '📖 Русский язык и культура речи',
+            type: 'callback',
+            value: 'dep_lizh_rus',
+          },
+        ],
+      },
+      contacts_services: {
+        text: 'Службы и управления университета:',
+        parent: 'menu_contacts',
+        buttons: [
+          {
+            id: 'srv1',
+            label: '💳 Управление бухгалтерского учёта',
+            type: 'callback',
+            value: 'srv_accounting',
+          },
+          {
+            id: 'srv2',
+            label: '👩‍💼 Управление по персоналу',
+            type: 'callback',
+            value: 'srv_hr',
+          },
+          {
+            id: 'srv3',
+            label: '👩‍🏫 Работа с абитуриентами',
+            type: 'callback',
+            value: 'srv_admission',
+          },
+          {
+            id: 'srv4',
+            label: '🌏 Международное сотрудничество',
+            type: 'callback',
+            value: 'srv_ic',
+          },
+          {
+            id: 'srv5',
+            label: '👪 Воспитательная работа',
+            type: 'callback',
+            value: 'srv_education',
+          },
+          {
+            id: 'srv6',
+            label: '💡 Центр проектной деятельности',
+            type: 'callback',
+            value: 'srv_projects',
+          },
+          {
+            id: 'srv7',
+            label: '🗂️ Студенческое бюро',
+            type: 'callback',
+            value: 'srv_student_bureau',
+          },
+          {
+            id: 'srv8',
+            label: '🛃 Профсоюзный комитет',
+            type: 'callback',
+            value: 'srv_student_trade',
+          },
+        ],
+      },
+      contacts_libraries: {
+        text: '🕘 **График работы библиотеки РГЭУ (РИНХ)**\n\n- Пн–Чт: 8:30–17:30\n- Пт, Сб: 8:30–16:15\n- Вс: выходной',
+        parent: 'menu_contacts',
+        buttons: [
+          {
+            id: 'lib1',
+            label: '📚 Абонементы',
+            type: 'callback',
+            value: 'lib_subscriptions',
+          },
+          {
+            id: 'lib2',
+            label: '📖 Читальные залы',
+            type: 'callback',
+            value: 'lib_reading_rooms',
+          },
+          {
+            id: 'lib3',
+            label: '💻 Электронный зал',
+            type: 'callback',
+            value: 'lib_e_reading_rooms',
+          },
+          {
+            id: 'lib4',
+            label: '🌐 Образовательные ресурсы',
+            type: 'callback',
+            value: 'lib_e_education_resources',
+          },
+        ],
+      },
+      menu_activities: {
+        text: 'Кружки, секции и центры:',
+        parent: 'main',
+        buttons: [
+          {
+            id: 'act1',
+            label: '🏀 Спортивные секции',
+            type: 'callback',
+            value: 'sec_sport',
+          },
+          {
+            id: 'act2',
+            label: '🎸 Творческие кружки',
+            type: 'callback',
+            value: 'sec_creative',
+          },
+          {
+            id: 'act3',
+            label: '🎓 Научные конференции',
+            type: 'callback',
+            value: 'sec_science',
+          },
+          {
+            id: 'act4',
+            label: '👩‍🏫 Штаб студ. отрядов (VK)',
+            type: 'url',
+            value: 'https://vk.com/rso_rsue',
+          },
+          {
+            id: 'act5',
+            label: '🇷🇺 Патриотический центр',
+            type: 'callback',
+            value: 'sec_patriot',
+          },
+        ],
+      },
+    };
+  }
+}
+</file>
+
+<file path="src/content/content.module.ts">
+import { Module } from '@nestjs/common';
+import { ContentService } from './content.service';
+
+@Module({
+  providers: [ContentService],
+  exports: [ContentService],
+})
+export class ContentModule {}
+</file>
+
+<file path="src/content/content.service.ts">
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+
+@Injectable()
+export class ContentService implements OnModuleInit {
+  private readonly logger = new Logger(ContentService.name);
+  private readonly filePath = path.resolve(
+    process.cwd(),
+    'data',
+    'content.json',
+  );
+  private readonly backupDir = path.resolve(process.cwd(), 'data', 'backups');
+  private readonly logFile = path.resolve(process.cwd(), 'data', 'changes.log');
+  private cache: Record<string, string> = {};
+
+  onModuleInit() {
+    this.loadFromDisk();
+  }
+
+  private loadFromDisk(): void {
+    try {
+      if (!fs.existsSync(this.filePath)) {
+        this.logger.warn(`Файл ${this.filePath} не найден. Создаю пустой.`);
+        fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
+        fs.writeFileSync(this.filePath, '{}', 'utf-8');
+      }
+      const raw = fs.readFileSync(this.filePath, 'utf-8');
+      this.cache = JSON.parse(raw) as Record<string, string>;
+      this.logger.log(
+        `Контент загружен: ${Object.keys(this.cache).length} записей`,
+      );
+    } catch (err) {
+      this.logger.error('Ошибка загрузки контента:', err);
+      this.cache = {};
+    }
+  }
+
+  get(key: string): string | null {
+    return this.cache[key] ?? null;
+  }
+
+  getAll(): Record<string, string> {
+    return { ...this.cache };
+  }
+
+  update(key: string, value: string, adminName = 'admin'): void {
+    const oldValue = this.cache[key] ?? '';
+    this.cache[key] = value;
+    this.saveToDisk();
+    this.appendLog(key, oldValue, value, adminName);
+    this.logger.log(`Обновлён ключ "${key}" администратором "${adminName}"`);
+  }
+
+  private saveToDisk(): void {
+    try {
+      // Создаём резервную копию перед сохранением
+      if (fs.existsSync(this.filePath)) {
+        fs.mkdirSync(this.backupDir, { recursive: true });
+        const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const backupPath = path.join(this.backupDir, `content_${ts}.json`);
+        fs.copyFileSync(this.filePath, backupPath);
+        this.cleanOldBackups();
+      }
+      fs.writeFileSync(
+        this.filePath,
+        JSON.stringify(this.cache, null, 2),
+        'utf-8',
+      );
+    } catch (err) {
+      this.logger.error('Ошибка сохранения контента:', err);
+    }
+  }
+
+  private cleanOldBackups(): void {
+    try {
+      const files = fs
+        .readdirSync(this.backupDir)
+        .filter((f) => f.startsWith('content_'))
+        .sort();
+      // Оставляем только последние 10 резервных копий
+      while (files.length > 10) {
+        const oldest = files.shift()!;
+        fs.unlinkSync(path.join(this.backupDir, oldest));
+      }
+    } catch {
+      // Игнорируем ошибки очистки бэкапов
+    }
+  }
+
+  private appendLog(
+    key: string,
+    oldVal: string,
+    newVal: string,
+    admin: string,
+  ): void {
+    try {
+      fs.mkdirSync(path.dirname(this.logFile), { recursive: true });
+      const ts = new Date().toLocaleString('ru-RU');
+      const line = `[${ts}] admin="${admin}" key="${key}"\n  OLD: ${oldVal.replace(/\n/g, '\\n').slice(0, 80)}\n  NEW: ${newVal.replace(/\n/g, '\\n').slice(0, 80)}\n\n`;
+      fs.appendFileSync(this.logFile, line, 'utf-8');
+    } catch {
+      // Игнорируем ошибки логирования
+    }
+  }
+}
+</file>
+
+<file path="src/main.ts">
+import 'dotenv/config';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import session from 'express-session';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET ?? 'rinh-bot-secret-change-me',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      },
+    }),
+  );
+
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+
+  console.log(`Приложение запущено на порту ${port}`);
+  console.log(`Панель управления: http://localhost:${port}/admin`);
+}
+
+void bootstrap().catch((err: unknown) => {
+  console.error('Ошибка при запуске приложения:', err);
+});
+</file>
+
+<file path="src/types/session.d.ts">
+import 'express-session';
+
+declare module 'express-session' {
+  interface SessionData {
+    role?: 'admin' | 'superAdmin';
+    username?: string;
+  }
+}
+</file>
+
+<file path="test/app.e2e-spec.ts">
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import { AppModule } from './../src/app.module';
+
+describe('AppController (e2e)', () => {
+  let app: INestApplication<App>;
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  it('/ (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Hello World!');
+  });
+});
+</file>
+
+<file path="test/jest-e2e.json">
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  }
+}
+</file>
+
+<file path="tsconfig.build.json">
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "ignoreDeprecations": "5.0",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
+</file>
+
+</files>

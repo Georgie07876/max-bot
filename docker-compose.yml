@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: rinh_assistant_redis
+    ports:
+      - "6379:6379"
+    restart: always
+   

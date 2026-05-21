@@ -1,0 +1,1857 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <title>Панель управления РГЭУ</title>
+    <style>
+      /* ===== RESET ===== */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: #f5f5f0;
+        color: #1a1a1a;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* ===== TOPBAR ===== */
+      .topbar {
+        height: 52px;
+        background: #fff;
+        border-bottom: 1px solid #e8e8e4;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 10px;
+        flex-shrink: 0;
+        z-index: 100;
+      }
+      .topbar-title {
+        font-size: 14px;
+        font-weight: 600;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .role-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .role-badge.superAdmin {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .role-badge.admin {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .logout-btn {
+        padding: 5px 12px;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #666;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .logout-btn:hover {
+        background: #f5f5f0;
+      }
+      .menu-btn {
+        display: none;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+      .menu-btn span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: #444;
+        border-radius: 2px;
+        transition: all 0.2s;
+      }
+      .menu-btn.open span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .menu-btn.open span:nth-child(2) {
+        opacity: 0;
+      }
+      .menu-btn.open span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      /* ===== TABS ===== */
+      .tabs {
+        height: 40px;
+        background: #fff;
+        border-bottom: 1px solid #e8e8e4;
+        display: flex;
+        flex-shrink: 0;
+        overflow-x: auto;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab {
+        padding: 0 16px;
+        font-size: 13px;
+        color: #888;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        transition: color 0.15s;
+      }
+      .tab:hover {
+        color: #1a1a1a;
+      }
+      .tab.active {
+        color: #0f6e56;
+        border-bottom-color: #1d9e75;
+        font-weight: 500;
+      }
+      .tab-icon {
+        font-size: 14px;
+      }
+
+      /* ===== LAYOUT ===== */
+      .layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* ===== SIDEBAR ===== */
+      .sidebar {
+        width: 268px;
+        background: #fff;
+        border-right: 1px solid #e8e8e4;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
+      }
+      .sidebar-search {
+        padding: 10px 12px;
+        border-bottom: 1px solid #f0f0ec;
+      }
+      .search-input {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid #e0e0dc;
+        border-radius: 8px;
+        font-size: 13px;
+        background: #f9f9f6;
+        outline: none;
+      }
+      .search-input:focus {
+        border-color: #1d9e75;
+        background: #fff;
+      }
+      .sidebar-list {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 16px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .sidebar-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      .sidebar-list::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 2px;
+      }
+
+      /* ===== ACCORDION ===== */
+      .acc-group {
+      }
+      .acc-header {
+        padding: 10px 14px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        transition: background 0.1s;
+      }
+      .acc-header:hover {
+        background: #f9f9f6;
+      }
+      .acc-header .chevron {
+        font-size: 10px;
+        transition: transform 0.2s;
+        color: #ccc;
+      }
+      .acc-header.open .chevron {
+        transform: rotate(90deg);
+      }
+      .acc-body {
+        display: none;
+      }
+      .acc-body.open {
+        display: block;
+      }
+
+      /* Sub-accordion (level 2) */
+      .acc-sub-header {
+        padding: 7px 14px 7px 20px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #888;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        transition: background 0.1s;
+      }
+      .acc-sub-header:hover {
+        background: #f5f5f0;
+      }
+      .acc-sub-header .chevron {
+        font-size: 9px;
+        transition: transform 0.2s;
+        color: #ccc;
+      }
+      .acc-sub-header.open .chevron {
+        transform: rotate(90deg);
+      }
+      .acc-sub-body {
+        display: none;
+      }
+      .acc-sub-body.open {
+        display: block;
+      }
+
+      /* Nav items */
+      .nav-item {
+        padding: 7px 16px 7px 28px;
+        font-size: 13px;
+        color: #555;
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        transition: background 0.1s;
+        line-height: 1.4;
+      }
+      .nav-item.l1 {
+        padding-left: 16px;
+      }
+      .nav-item:hover {
+        background: #f5f5f0;
+        color: #1a1a1a;
+      }
+      .nav-item:active {
+        background: #e8f5f0;
+      }
+      .nav-item.active {
+        background: #f0faf5;
+        color: #0f6e56;
+        border-left-color: #1d9e75;
+        font-weight: 500;
+      }
+      .nav-item.modified::after {
+        content: ' ●';
+        color: #f59e0b;
+        font-size: 10px;
+      }
+
+      /* ===== SIDEBAR OVERLAY ===== */
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 199;
+      }
+      .sidebar-overlay.show {
+        display: block;
+      }
+
+      /* ===== MAIN ===== */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #fafaf8;
+        min-width: 0;
+      }
+
+      /* ===== MAIN HEADER ===== */
+      .main-header {
+        background: #fff;
+        border-bottom: 1px solid #e8e8e4;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+      }
+      .main-key {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: #f0f0ec;
+        padding: 2px 7px;
+        border-radius: 4px;
+        color: #888;
+        flex-shrink: 0;
+      }
+      .main-title {
+        font-size: 14px;
+        font-weight: 500;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .header-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .btn-primary {
+        padding: 7px 16px;
+        background: #1d9e75;
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+        white-space: nowrap;
+        min-height: 34px;
+      }
+      .btn-primary:hover {
+        background: #0f6e56;
+      }
+      .btn-primary:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .btn-primary.saved {
+        background: #16a34a;
+      }
+      .btn-primary.error-state {
+        background: #dc2626;
+      }
+      .btn-secondary {
+        padding: 7px 14px;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #555;
+        cursor: pointer;
+        min-height: 34px;
+        white-space: nowrap;
+      }
+      .btn-secondary:hover {
+        background: #f5f5f0;
+      }
+      .btn-danger {
+        padding: 5px 12px;
+        background: transparent;
+        border: 1px solid #fca5a5;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #dc2626;
+        cursor: pointer;
+      }
+      .btn-danger:hover {
+        background: #fef2f2;
+      }
+      .preview-toggle {
+        display: none;
+        padding: 7px 12px;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 12px;
+        color: #555;
+        cursor: pointer;
+        white-space: nowrap;
+        min-height: 34px;
+      }
+      .preview-toggle.active {
+        background: #f0faf5;
+        border-color: #1d9e75;
+        color: #0f6e56;
+      }
+
+      /* ===== EDITOR ===== */
+      .editor-area {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+      }
+      .editor-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 14px;
+        min-width: 0;
+      }
+      .pane-label {
+        font-size: 10px;
+        color: #aaa;
+        margin-bottom: 6px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .editor-textarea {
+        flex: 1;
+        resize: none;
+        border: 1px solid #e0e0dc;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        background: #fff;
+        color: #1a1a1a;
+        outline: none;
+        line-height: 1.7;
+        -webkit-overflow-scrolling: touch;
+      }
+      .editor-textarea:focus {
+        border-color: #1d9e75;
+      }
+      .preview-pane {
+        width: 280px;
+        flex-shrink: 0;
+        border-left: 1px solid #e8e8e4;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+      .preview-content {
+        flex: 1;
+        overflow-y: auto;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #333;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      /* ===== EMPTY STATE ===== */
+      .empty-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        gap: 8px;
+        padding: 20px;
+      }
+      .empty-state p {
+        font-size: 14px;
+        color: #aaa;
+      }
+      .empty-state small {
+        font-size: 12px;
+        color: #bbb;
+        text-align: center;
+      }
+
+      /* ===== PANELS (Меню и Администраторы) ===== */
+      .panel {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .panel-section {
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e8e8e4;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .panel-section-header {
+        padding: 12px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        border-bottom: 1px solid #f0f0ec;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .panel-section-body {
+        padding: 14px 16px;
+      }
+
+      /* Menu tree */
+      .menu-tree-item {
+        border: 1px solid #e8e8e4;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .menu-tree-header {
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        background: #f9f9f6;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .menu-tree-header:hover {
+        background: #f0faf5;
+      }
+      .menu-id {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: #e8e8e4;
+        padding: 1px 6px;
+        border-radius: 3px;
+        color: #666;
+      }
+      .menu-tree-body {
+        display: none;
+        padding: 10px 12px;
+        border-top: 1px solid #f0f0ec;
+      }
+      .menu-tree-body.open {
+        display: block;
+      }
+      .btn-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .btn-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        background: #f9f9f6;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+      .btn-row-label {
+        flex: 1;
+        color: #333;
+      }
+      .btn-row-type {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        background: #e0e0dc;
+        color: #666;
+      }
+      .btn-row-type.url {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .btn-move {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #aaa;
+        padding: 2px 4px;
+        font-size: 13px;
+        border-radius: 3px;
+      }
+      .btn-move:hover {
+        background: #eee;
+        color: #444;
+      }
+
+      /* Form row */
+      .form-row {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        min-width: 100px;
+      }
+      .form-label {
+        font-size: 11px;
+        color: #888;
+        font-weight: 500;
+      }
+      .form-input {
+        padding: 7px 10px;
+        border: 1px solid #e0e0dc;
+        border-radius: 6px;
+        font-size: 13px;
+        outline: none;
+      }
+      .form-input:focus {
+        border-color: #1d9e75;
+      }
+      .form-select {
+        padding: 7px 10px;
+        border: 1px solid #e0e0dc;
+        border-radius: 6px;
+        font-size: 13px;
+        outline: none;
+        background: #fff;
+      }
+
+      /* Admin list */
+      .admin-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid #e8e8e4;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
+      .admin-row-name {
+        flex: 1;
+        font-weight: 500;
+      }
+      .admin-row-date {
+        font-size: 11px;
+        color: #aaa;
+      }
+      .admin-role-badge {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 8px;
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      /* ===== STATUS BAR ===== */
+      .statusbar {
+        height: 28px;
+        background: #fff;
+        border-top: 1px solid #e8e8e4;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #16a34a;
+        flex-shrink: 0;
+      }
+      .status-dot.warn {
+        background: #f59e0b;
+      }
+      .status-dot.error {
+        background: #dc2626;
+      }
+      .status-text {
+        font-size: 11px;
+        color: #888;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .status-count {
+        font-size: 11px;
+        color: #aaa;
+        white-space: nowrap;
+      }
+
+      /* ===== TOAST ===== */
+      .toast {
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: #1a1a1a;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        opacity: 0;
+        transition: all 0.25s;
+        pointer-events: none;
+        z-index: 9999;
+        white-space: nowrap;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ===== MOBILE ===== */
+      @media (max-width: 680px) {
+        .menu-btn {
+          display: flex;
+        }
+        .topbar-sub {
+          display: none;
+        }
+        .sidebar {
+          position: fixed;
+          top: 92px;
+          left: 0;
+          bottom: 0;
+          width: 82vw;
+          max-width: 300px;
+          z-index: 200;
+          transform: translateX(-100%);
+          box-shadow: none;
+          border-right: none;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.12);
+        }
+        .nav-item {
+          padding: 11px 16px 11px 28px;
+          font-size: 14px;
+        }
+        .nav-item.l1 {
+          padding-left: 16px;
+        }
+        .acc-header {
+          padding: 13px 14px;
+        }
+        .acc-sub-header {
+          padding: 10px 14px 10px 20px;
+        }
+        .preview-toggle {
+          display: block;
+        }
+        .preview-pane {
+          display: none;
+        }
+        .preview-pane.mobile-show {
+          display: flex;
+          position: fixed;
+          inset: 92px 0 0 0;
+          width: 100%;
+          z-index: 150;
+          border-left: none;
+          border-top: 1px solid #e8e8e4;
+          padding: 14px;
+        }
+        .btn-primary {
+          padding: 8px 14px;
+          font-size: 13px;
+        }
+        .editor-textarea {
+          font-size: 14px;
+        }
+        .status-count {
+          display: none;
+        }
+      }
+      @media (max-width: 380px) {
+        .main-key {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <button class="menu-btn" id="menu-btn" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title">Панель управления РГЭУ</div>
+      <span class="role-badge" id="role-badge"></span>
+      <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <div class="tab active" onclick="switchTab('content')" id="tab-content">
+        <span class="tab-icon">📝</span>Контент
+      </div>
+      <div
+        class="tab"
+        onclick="switchTab('menus')"
+        id="tab-menus"
+        style="display: none"
+      >
+        <span class="tab-icon">🔘</span>Меню бота
+      </div>
+      <div
+        class="tab"
+        onclick="switchTab('admins')"
+        id="tab-admins"
+        style="display: none"
+      >
+        <span class="tab-icon">👥</span>Администраторы
+      </div>
+    </div>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ===== CONTENT TAB ===== -->
+    <div class="layout" id="pane-content">
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-search">
+          <input
+            class="search-input"
+            type="text"
+            id="search"
+            placeholder="Поиск..."
+            oninput="filterItems(this.value)"
+          />
+        </div>
+        <div class="sidebar-list" id="sidebar-list"></div>
+      </div>
+      <div class="main">
+        <div class="main-header" id="main-header" style="display: none">
+          <span class="main-key" id="main-key"></span>
+          <span class="main-title" id="main-title"></span>
+          <div class="header-actions">
+            <button
+              class="preview-toggle"
+              id="preview-toggle"
+              onclick="toggleMobilePreview()"
+            >
+              Просмотр
+            </button>
+            <button
+              class="btn-primary"
+              id="save-btn"
+              onclick="saveContent()"
+              disabled
+            >
+              Сохранить
+            </button>
+          </div>
+        </div>
+        <div class="editor-area" id="editor-area">
+          <div class="empty-state" id="empty-state">
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.2"
+            >
+              <path
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"
+              />
+            </svg>
+            <p>Выберите раздел</p>
+            <small>Нажмите ☰ или выберите пункт слева</small>
+          </div>
+          <div class="editor-pane" id="editor-pane" style="display: none">
+            <div class="pane-label">Markdown-текст (эмодзи поддерживаются)</div>
+            <textarea
+              class="editor-textarea"
+              id="editor"
+              oninput="onEdit()"
+              autocorrect="off"
+              spellcheck="false"
+            ></textarea>
+          </div>
+          <div class="preview-pane" id="preview-pane" style="display: none">
+            <div
+              class="pane-label"
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              "
+            >
+              Предпросмотр
+              <button
+                onclick="closeMobilePreview()"
+                id="close-preview-btn"
+                style="
+                  display: none;
+                  border: none;
+                  background: transparent;
+                  font-size: 18px;
+                  cursor: pointer;
+                  color: #888;
+                "
+              >
+                ✕
+              </button>
+            </div>
+            <div class="preview-content" id="preview"></div>
+          </div>
+        </div>
+        <div class="statusbar">
+          <div class="status-dot" id="status-dot"></div>
+          <span class="status-text" id="status-text">Загрузка...</span>
+          <span class="status-count" id="char-count"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MENUS TAB ===== -->
+    <div class="layout" id="pane-menus" style="display: none">
+      <div class="panel" id="menus-panel"></div>
+    </div>
+
+    <!-- ===== ADMINS TAB ===== -->
+    <div class="layout" id="pane-admins" style="display: none">
+      <div class="panel" id="admins-panel"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      // ========================
+      // GLOBALS
+      // ========================
+      let currentRole = 'admin';
+      let currentUsername = '';
+      let allContent = {};
+      let allMenus = {};
+      let currentKey = null;
+      let modified = {};
+      let mobilePreviewOpen = false;
+      let sidebarOpen = false;
+      let currentTab = 'content';
+
+      // ========================
+      // ACCORDION CONFIG
+      // ========================
+      const ACCORDION = [
+        {
+          label: 'Факультеты',
+          items: [
+            {
+              key: 'fac_management',
+              label: 'Менеджмента и предпринимательства',
+            },
+            { key: 'fac_trade', label: 'Торгового дела' },
+            { key: 'fac_it', label: 'КТиИБ' },
+            { key: 'fac_accounting', label: 'Учетно-экономический' },
+            { key: 'fac_economics', label: 'Экономики и финансов' },
+            { key: 'fac_law', label: 'Юридический' },
+            { key: 'fac_linguistics', label: 'Лингвистики и журналистики' },
+          ],
+        },
+        {
+          label: 'Кафедры',
+          sub: [
+            {
+              label: 'МиП',
+              items: [
+                { key: 'dep_mip_hr', label: 'Финансовый и HR менеджмент' },
+                {
+                  key: 'dep_mip_strat',
+                  label: 'Общий и стратегический менедж.',
+                },
+                {
+                  key: 'dep_mip_gmu',
+                  label: 'ГМУ и экономическая безопасность',
+                },
+                { key: 'dep_mip_innov', label: 'Инновационный менеджмент' },
+                {
+                  key: 'dep_mip_anticrisis',
+                  label: 'Антикризисное и корп. управление',
+                },
+              ],
+            },
+            {
+              label: 'Торгового дела',
+              items: [
+                { key: 'dep_td_phil', label: 'Философия и культурология' },
+                { key: 'dep_td_comm', label: 'Коммерция и логистика' },
+                { key: 'dep_td_mark', label: 'Маркетинг и реклама' },
+                {
+                  key: 'dep_td_customs',
+                  label: 'Международная торговля и таможня',
+                },
+                { key: 'dep_td_theory', label: 'Экономическая теория' },
+                {
+                  key: 'dep_td_quality',
+                  label: 'Товароведение и управление качеством',
+                },
+              ],
+            },
+            {
+              label: 'КТиИБ',
+              items: [
+                {
+                  key: 'dep_ktib_is',
+                  label: 'Инф. системы и прикл. информатика',
+                },
+                {
+                  key: 'dep_ktib_ai',
+                  label: 'Прикл. математика и технологии ИИ',
+                },
+                {
+                  key: 'dep_ktib_it',
+                  label: 'Информационные технологии и прогр.',
+                },
+                { key: 'dep_ktib_sec', label: 'Информационная безопасность' },
+                { key: 'dep_ktib_sport', label: 'Физвоспитание и спорт' },
+              ],
+            },
+            {
+              label: 'УЭФ',
+              items: [
+                { key: 'dep_uef_acc', label: 'Бухгалтерский учёт' },
+                { key: 'dep_uef_audit', label: 'Аудит' },
+                { key: 'dep_uef_analysis', label: 'Анализ хоз. деятельности' },
+                { key: 'dep_uef_stat', label: 'Статистика и эконометрика' },
+                {
+                  key: 'dep_uef_world',
+                  label: 'Мировая экономика и межд. отношения',
+                },
+              ],
+            },
+            {
+              label: 'ЭиФ',
+              items: [
+                { key: 'dep_eif_bank', label: 'Банковское дело' },
+                { key: 'dep_eif_fin', label: 'Финансы' },
+                { key: 'dep_eif_tax', label: 'Налоги и налогообложение' },
+                { key: 'dep_eif_monit', label: 'Финансовый мониторинг' },
+                {
+                  key: 'dep_eif_reg',
+                  label: 'Экономика региона, отраслей и предпр.',
+                },
+              ],
+            },
+            {
+              label: 'Юридического',
+              items: [
+                { key: 'dep_law_civ', label: 'Гражданское право' },
+                {
+                  key: 'dep_law_hist',
+                  label: 'Исторические науки и политология',
+                },
+                {
+                  key: 'dep_law_const',
+                  label: 'Конституционное и муниц. право',
+                },
+                {
+                  key: 'dep_law_crim_exp',
+                  label: 'Судебная экспертиза и криминалистика',
+                },
+                {
+                  key: 'dep_law_theory',
+                  label: 'Теория и история государства и права',
+                },
+                {
+                  key: 'dep_law_crim',
+                  label: 'Уголовное право и криминология',
+                },
+                {
+                  key: 'dep_law_fin',
+                  label: 'Финансовое и административное право',
+                },
+                { key: 'dep_law_proc', label: 'Процессуальное право' },
+              ],
+            },
+            {
+              label: 'ЛиЖ',
+              items: [
+                {
+                  key: 'dep_lizh_econ',
+                  label: 'Ин. языки для экон. специальностей',
+                },
+                {
+                  key: 'dep_lizh_hum',
+                  label: 'Ин. языки для гум. специальностей',
+                },
+                { key: 'dep_lizh_journ', label: 'Журналистика' },
+                {
+                  key: 'dep_lizh_ling',
+                  label: 'Лингвистика и межкульт. коммуникация',
+                },
+                { key: 'dep_lizh_rus', label: 'Русский язык и культура речи' },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Службы',
+          items: [
+            { key: 'srv_accounting', label: 'Управление бухгалтерского учёта' },
+            { key: 'srv_hr', label: 'Управление по персоналу' },
+            { key: 'srv_admission', label: 'Работа с абитуриентами' },
+            { key: 'srv_ic', label: 'Международное сотрудничество' },
+            { key: 'srv_education', label: 'Воспитательная работа' },
+            { key: 'srv_projects', label: 'Центр проектной деятельности' },
+            { key: 'srv_student_bureau', label: 'Студенческое бюро' },
+            { key: 'srv_student_trade', label: 'Профсоюзный комитет' },
+          ],
+        },
+        {
+          label: 'Библиотеки',
+          items: [
+            { key: 'lib_subscriptions', label: 'Абонементы' },
+            { key: 'lib_reading_rooms', label: 'Читальные залы' },
+            { key: 'lib_e_reading_rooms', label: 'Электронный читальный зал' },
+            { key: 'lib_e_education_resources', label: 'Онлайн-ресурсы' },
+          ],
+        },
+        {
+          label: 'Дополнительно',
+          items: [
+            { key: 'contacts_masters', label: 'Институт магистратуры' },
+            { key: 'contacts_phd', label: 'Аспирантура и докторантура' },
+            { key: 'contacts_hostels', label: 'Общежития' },
+          ],
+        },
+        {
+          label: 'Секции и кружки',
+          items: [
+            { key: 'sec_patriot', label: 'Центр патриотического воспитания' },
+            { key: 'sec_sport', label: 'Спортивные секции' },
+            { key: 'sec_creative', label: 'Творческие кружки' },
+            { key: 'sec_science', label: 'Научные конференции' },
+          ],
+        },
+      ];
+
+      // ========================
+      // INIT
+      // ========================
+      async function init() {
+        try {
+          const r = await fetch('/admin/api/session');
+          if (r.status === 401 || r.status === 403) {
+            window.location.href = '/admin/login';
+            return;
+          }
+          const session = await r.json();
+          currentRole = session.role;
+          currentUsername = session.username;
+          document.getElementById('role-badge').textContent =
+            currentRole === 'superAdmin' ? '⭐ SuperAdmin' : '👤 Admin';
+          document.getElementById('role-badge').className =
+            'role-badge ' + currentRole;
+
+          if (currentRole === 'superAdmin') {
+            document.getElementById('tab-menus').style.display = 'flex';
+            document.getElementById('tab-admins').style.display = 'flex';
+          }
+          await loadContent();
+        } catch (e) {
+          setStatus('Ошибка подключения', 'error');
+        }
+      }
+
+      // ========================
+      // TABS
+      // ========================
+      function switchTab(tab) {
+        currentTab = tab;
+        ['content', 'menus', 'admins'].forEach((t) => {
+          document.getElementById('pane-' + t).style.display =
+            t === tab ? 'flex' : 'none';
+          document
+            .getElementById('tab-' + t)
+            ?.classList.toggle('active', t === tab);
+        });
+        if (tab === 'menus' && Object.keys(allMenus).length === 0) loadMenus();
+        if (tab === 'admins') loadAdmins();
+      }
+
+      // ========================
+      // CONTENT TAB
+      // ========================
+      async function loadContent() {
+        try {
+          const r = await fetch('/admin/api/content');
+          if (r.status === 401) {
+            window.location.href = '/admin/login';
+            return;
+          }
+          allContent = await r.json();
+          renderSidebar(allContent);
+          setStatus(
+            'Данные загружены (' + Object.keys(allContent).length + ' записей)',
+            'ok',
+          );
+        } catch (e) {
+          setStatus('Ошибка загрузки контента', 'error');
+        }
+      }
+
+      function renderSidebar(content, query = '') {
+        const list = document.getElementById('sidebar-list');
+        list.innerHTML = '';
+
+        for (const group of ACCORDION) {
+          const groupEl = document.createElement('div');
+          groupEl.className = 'acc-group';
+
+          // Собираем все ключи группы
+          const allKeys = group.sub
+            ? group.sub.flatMap((s) => s.items.map((i) => i.key))
+            : (group.items || []).map((i) => i.key);
+
+          const matchKeys = allKeys.filter((k) => {
+            if (!query) return true;
+            const item = (
+              group.sub ? group.sub.flatMap((s) => s.items) : group.items
+            ).find((i) => i.key === k);
+            return (
+              item &&
+              (item.label.toLowerCase().includes(query.toLowerCase()) ||
+                k.includes(query.toLowerCase()))
+            );
+          });
+
+          if (query && matchKeys.length === 0) continue;
+
+          const header = document.createElement('div');
+          header.className = 'acc-header' + (!query ? ' open' : '');
+          header.innerHTML = `<span>${group.label}</span><span class="chevron">▶</span>`;
+          header.onclick = () => {
+            header.classList.toggle('open');
+            body.classList.toggle('open');
+          };
+          groupEl.appendChild(header);
+
+          const body = document.createElement('div');
+          body.className = 'acc-body' + (!query ? ' open' : '');
+
+          if (group.sub) {
+            // 3-level: group → sub → items
+            for (const sub of group.sub) {
+              const subKeys = sub.items
+                .map((i) => i.key)
+                .filter((k) => {
+                  if (!query) return true;
+                  const item = sub.items.find((i) => i.key === k);
+                  return (
+                    item &&
+                    (item.label.toLowerCase().includes(query.toLowerCase()) ||
+                      k.includes(query.toLowerCase()))
+                  );
+                });
+              if (query && subKeys.length === 0) continue;
+
+              const subHeader = document.createElement('div');
+              subHeader.className = 'acc-sub-header' + (!query ? ' open' : '');
+              subHeader.innerHTML = `<span>${sub.label}</span><span class="chevron">▶</span>`;
+              const subBody = document.createElement('div');
+              subBody.className = 'acc-sub-body' + (!query ? ' open' : '');
+              subHeader.onclick = () => {
+                subHeader.classList.toggle('open');
+                subBody.classList.toggle('open');
+              };
+
+              for (const item of sub.items) {
+                if (
+                  query &&
+                  !item.label.toLowerCase().includes(query.toLowerCase()) &&
+                  !item.key.includes(query.toLowerCase())
+                )
+                  continue;
+                if (!content[item.key]) continue;
+                subBody.appendChild(makeNavItem(item));
+              }
+
+              body.appendChild(subHeader);
+              body.appendChild(subBody);
+            }
+          } else {
+            // 2-level: group → items
+            for (const item of group.items || []) {
+              if (
+                query &&
+                !item.label.toLowerCase().includes(query.toLowerCase()) &&
+                !item.key.includes(query.toLowerCase())
+              )
+                continue;
+              if (!content[item.key]) continue;
+              const el = makeNavItem(item);
+              el.classList.add('l1');
+              body.appendChild(el);
+            }
+          }
+
+          groupEl.appendChild(body);
+          list.appendChild(groupEl);
+        }
+      }
+
+      function makeNavItem(item) {
+        const el = document.createElement('div');
+        el.className =
+          'nav-item' +
+          (item.key === currentKey ? ' active' : '') +
+          (modified[item.key] ? ' modified' : '');
+        el.textContent = item.label;
+        el.title = item.key;
+        el.onclick = () => {
+          selectKey(item.key, item.label);
+          closeSidebar();
+        };
+        return el;
+      }
+
+      function filterItems(q) {
+        renderSidebar(allContent, q);
+      }
+
+      function selectKey(key, label) {
+        if (currentKey === key) return;
+        if (
+          currentKey &&
+          modified[currentKey] &&
+          !confirm('Есть несохранённые изменения. Продолжить?')
+        )
+          return;
+        currentKey = key;
+        document.getElementById('editor').value = allContent[key] || '';
+        document.getElementById('main-key').textContent = key;
+        document.getElementById('main-title').textContent = label;
+        document.getElementById('main-header').style.display = 'flex';
+        document.getElementById('editor-pane').style.display = 'flex';
+        document.getElementById('empty-state').style.display = 'none';
+        if (window.innerWidth > 680)
+          document.getElementById('preview-pane').style.display = 'flex';
+        updatePreview();
+        updateCharCount();
+        updateSaveBtn();
+        renderSidebar(allContent, document.getElementById('search').value);
+      }
+
+      function onEdit() {
+        const val = document.getElementById('editor').value;
+        if (currentKey)
+          modified[currentKey] = val !== (allContent[currentKey] || '');
+        if (mobilePreviewOpen || window.innerWidth > 680) updatePreview();
+        updateCharCount();
+        updateSaveBtn();
+      }
+
+      function updatePreview() {
+        const val = document.getElementById('editor').value;
+        document.getElementById('preview').textContent = val.replace(
+          /\*\*(.*?)\*\*/g,
+          '$1',
+        );
+      }
+
+      function updateCharCount() {
+        document.getElementById('char-count').textContent =
+          document.getElementById('editor').value.length + ' симв.';
+      }
+
+      function updateSaveBtn() {
+        const btn = document.getElementById('save-btn');
+        btn.disabled = !currentKey || !modified[currentKey];
+        btn.textContent = 'Сохранить';
+        btn.className = 'btn-primary';
+      }
+
+      async function saveContent() {
+        if (!currentKey) return;
+        const value = document.getElementById('editor').value;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.textContent = 'Сохраняю...';
+        try {
+          const r = await fetch(
+            '/admin/api/content/' + encodeURIComponent(currentKey),
+            {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ value }),
+            },
+          );
+          if (r.status === 401) {
+            window.location.href = '/admin/login';
+            return;
+          }
+          if (r.ok) {
+            allContent[currentKey] = value;
+            delete modified[currentKey];
+            btn.textContent = 'Сохранено ✓';
+            btn.className = 'btn-primary saved';
+            showToast('Сохранено ✓');
+            setStatus('Сохранено: ' + currentKey, 'ok');
+            renderSidebar(allContent, document.getElementById('search').value);
+            setTimeout(() => {
+              btn.textContent = 'Сохранить';
+              btn.className = 'btn-primary';
+              btn.disabled = true;
+            }, 2000);
+          } else throw new Error();
+        } catch {
+          btn.textContent = 'Ошибка ✗';
+          btn.className = 'btn-primary error-state';
+          btn.disabled = false;
+          showToast('Ошибка сохранения!');
+          setTimeout(() => {
+            btn.textContent = 'Сохранить';
+            btn.className = 'btn-primary';
+          }, 3000);
+        }
+      }
+
+      // ========================
+      // MENUS TAB
+      // ========================
+      async function loadMenus() {
+        try {
+          const r = await fetch('/admin/api/menus');
+          if (!r.ok) return;
+          allMenus = await r.json();
+          renderMenus();
+        } catch (e) {}
+      }
+
+      function renderMenus() {
+        const panel = document.getElementById('menus-panel');
+        panel.innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-header">
+        Структура меню бота
+        <span style="font-size:11px;color:#aaa;font-weight:400">Кликните на меню для редактирования</span>
+      </div>
+      <div class="panel-section-body" id="menu-tree"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-header">Добавить новое меню</div>
+      <div class="panel-section-body">
+        <div class="form-row">
+          <div class="form-group"><div class="form-label">ID меню (уникальный, латиница)</div><input class="form-input" id="new-menu-id" placeholder="например: my_custom_menu"></div>
+          <div class="form-group"><div class="form-label">Текст над кнопками</div><input class="form-input" id="new-menu-text" placeholder="Выберите раздел:"></div>
+          <div class="form-group" style="flex:0"><div class="form-label">Родитель</div>
+            <select class="form-select" id="new-menu-parent"><option value="">нет</option>${Object.keys(
+              allMenus,
+            )
+              .map((k) => `<option value="${k}">${k}</option>`)
+              .join('')}</select>
+          </div>
+          <button class="btn-primary" style="flex:0;align-self:flex-end" onclick="addMenu()">+ Создать</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+        const tree = document.getElementById('menu-tree');
+        for (const [menuId, menu] of Object.entries(allMenus)) {
+          tree.appendChild(renderMenuNode(menuId, menu));
+        }
+      }
+
+      function renderMenuNode(menuId, menu) {
+        const node = document.createElement('div');
+        node.className = 'menu-tree-item';
+        node.innerHTML = `
+    <div class="menu-tree-header" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span class="menu-id">${menuId}</span>
+      <span style="flex:1;color:#555;font-size:12px;margin-left:8px">${menu.text.slice(0, 50)}${menu.text.length > 50 ? '...' : ''}</span>
+      ${menu.parent ? `<span style="font-size:11px;color:#aaa">← ${menu.parent}</span>` : ''}
+      <button class="btn-danger" style="margin-left:8px" onclick="event.stopPropagation();deleteMenu('${menuId}')">✕</button>
+    </div>
+    <div class="menu-tree-body">
+      <div style="margin-bottom:8px">
+        <div class="form-label" style="margin-bottom:4px">Текст над кнопками</div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" style="flex:1" id="menu-text-${menuId}" value="${menu.text.replace(/"/g, '&quot;')}">
+          <button class="btn-primary" style="flex:0" onclick="saveMenuText('${menuId}')">Сохранить</button>
+        </div>
+      </div>
+      <div class="pane-label">Кнопки (${menu.buttons.length})</div>
+      <div class="btn-list" id="btn-list-${menuId}">
+        ${menu.buttons
+          .map(
+            (btn) => `
+          <div class="btn-row" id="btn-${btn.id}">
+            <span class="btn-row-label">${btn.label}</span>
+            <span class="btn-row-type ${btn.type}">${btn.type}</span>
+            <span style="font-size:11px;color:#aaa;font-family:monospace;flex:0;white-space:nowrap">${btn.value.slice(0, 20)}${btn.value.length > 20 ? '...' : ''}</span>
+            <button class="btn-move" onclick="moveBtn('${menuId}','${btn.id}','up')" title="Вверх">↑</button>
+            <button class="btn-move" onclick="moveBtn('${menuId}','${btn.id}','down')" title="Вниз">↓</button>
+            <button class="btn-move" onclick="editBtn('${menuId}','${btn.id}','${btn.label.replace(/'/g, "\\'")}','${btn.type}','${btn.value.replace(/'/g, "\\'")}')">✏️</button>
+            <button class="btn-danger" onclick="deleteBtn('${menuId}','${btn.id}')">✕</button>
+          </div>`,
+          )
+          .join('')}
+      </div>
+      <div class="form-row" style="margin-top:10px">
+        <div class="form-group"><div class="form-label">Текст кнопки</div><input class="form-input" id="new-btn-label-${menuId}" placeholder="🏫 Название раздела"></div>
+        <div class="form-group" style="flex:0"><div class="form-label">Тип</div>
+          <select class="form-select" id="new-btn-type-${menuId}">
+            <option value="callback">callback</option>
+            <option value="url">url</option>
+          </select>
+        </div>
+        <div class="form-group"><div class="form-label">Значение (ID меню или URL)</div><input class="form-input" id="new-btn-value-${menuId}" placeholder="menu_id или https://..."></div>
+        <button class="btn-primary" style="flex:0;align-self:flex-end" onclick="addBtn('${menuId}')">+ Добавить</button>
+      </div>
+    </div>`;
+        return node;
+      }
+
+      async function addMenu() {
+        const id = document.getElementById('new-menu-id').value.trim();
+        const text = document.getElementById('new-menu-text').value.trim();
+        const parent = document.getElementById('new-menu-parent').value || null;
+        if (!id || !text) {
+          showToast('Заполните ID и текст');
+          return;
+        }
+        const r = await fetch('/admin/api/menus', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, text, parent }),
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Меню создано');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function deleteMenu(menuId) {
+        if (
+          !confirm(
+            `Удалить меню "${menuId}"? Кнопки из других меню, ссылающиеся на него, тоже удалятся.`,
+          )
+        )
+          return;
+        const r = await fetch('/admin/api/menus/' + menuId, {
+          method: 'DELETE',
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Удалено');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function saveMenuText(menuId) {
+        const text = document.getElementById('menu-text-' + menuId).value;
+        const r = await fetch('/admin/api/menus/' + menuId + '/text', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        const d = await r.json();
+        if (d.ok) showToast('Текст меню сохранён');
+        else showToast('Ошибка: ' + d.error);
+      }
+
+      async function addBtn(menuId) {
+        const label = document
+          .getElementById('new-btn-label-' + menuId)
+          .value.trim();
+        const type = document.getElementById('new-btn-type-' + menuId).value;
+        const value = document
+          .getElementById('new-btn-value-' + menuId)
+          .value.trim();
+        if (!label || !value) {
+          showToast('Заполните текст и значение кнопки');
+          return;
+        }
+        const r = await fetch('/admin/api/menus/' + menuId + '/buttons', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, type, value }),
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Кнопка добавлена');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function deleteBtn(menuId, btnId) {
+        if (!confirm('Удалить кнопку?')) return;
+        const r = await fetch(
+          '/admin/api/menus/' + menuId + '/buttons/' + btnId,
+          { method: 'DELETE' },
+        );
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Кнопка удалена');
+          await loadMenus();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function moveBtn(menuId, btnId, direction) {
+        const r = await fetch(
+          '/admin/api/menus/' + menuId + '/buttons/' + btnId + '/move',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ direction }),
+          },
+        );
+        const d = await r.json();
+        if (d.ok) await loadMenus();
+      }
+
+      function editBtn(menuId, btnId, label, type, value) {
+        const newLabel = prompt('Текст кнопки:', label);
+        if (newLabel === null) return;
+        const newValue = prompt('Значение (ID меню или URL):', value);
+        if (newValue === null) return;
+        fetch('/admin/api/menus/' + menuId + '/buttons/' + btnId, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label: newLabel, type, value: newValue }),
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.ok) {
+              showToast('Кнопка обновлена');
+              loadMenus();
+            } else showToast('Ошибка: ' + d.error);
+          });
+      }
+
+      // ========================
+      // ADMINS TAB
+      // ========================
+      async function loadAdmins() {
+        try {
+          const r = await fetch('/admin/api/admins');
+          if (!r.ok) return;
+          const admins = await r.json();
+          renderAdmins(admins);
+        } catch (e) {}
+      }
+
+      function renderAdmins(admins) {
+        const panel = document.getElementById('admins-panel');
+        const superName = '(из .env)';
+        panel.innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-header">SuperAdmin</div>
+      <div class="panel-section-body">
+        <div class="admin-row">
+          <span class="admin-role-badge" style="background:#fef3c7;color:#92400e">⭐ superAdmin</span>
+          <span class="admin-row-name">${currentRole === 'superAdmin' ? currentUsername : '***'}</span>
+          <span class="admin-row-date">${superName}</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-header">
+        Администраторы
+        <span style="font-size:11px;color:#aaa;font-weight:400">${admins.length} чел.</span>
+      </div>
+      <div class="panel-section-body">
+        ${
+          admins.length === 0
+            ? '<p style="color:#aaa;font-size:13px">Пока нет ни одного администратора</p>'
+            : admins
+                .map(
+                  (u) => `
+            <div class="admin-row">
+              <span class="admin-role-badge">admin</span>
+              <span class="admin-row-name">${u.username}</span>
+              <span class="admin-row-date">${new Date(u.createdAt).toLocaleDateString('ru-RU')}</span>
+              <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="changePass('${u.id}','${u.username}')">Пароль</button>
+              <button class="btn-danger" onclick="deleteAdmin('${u.id}','${u.username}')">Удалить</button>
+            </div>`,
+                )
+                .join('')
+        }
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-header">Добавить администратора</div>
+      <div class="panel-section-body">
+        <div class="form-row">
+          <div class="form-group"><div class="form-label">Имя пользователя</div><input class="form-input" id="new-admin-name" placeholder="Имя без пробелов"></div>
+          <div class="form-group"><div class="form-label">Пароль</div><input class="form-input" type="password" id="new-admin-pass" placeholder="Минимум 6 символов"></div>
+          <button class="btn-primary" style="flex:0;align-self:flex-end" onclick="createAdmin()">+ Добавить</button>
+        </div>
+      </div>
+    </div>`;
+      }
+
+      async function createAdmin() {
+        const username = document.getElementById('new-admin-name').value.trim();
+        const password = document.getElementById('new-admin-pass').value;
+        if (!username || !password) {
+          showToast('Заполните имя и пароль');
+          return;
+        }
+        if (password.length < 6) {
+          showToast('Пароль минимум 6 символов');
+          return;
+        }
+        const r = await fetch('/admin/api/admins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Администратор создан');
+          await loadAdmins();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function deleteAdmin(id, name) {
+        if (!confirm(`Удалить администратора "${name}"?`)) return;
+        const r = await fetch('/admin/api/admins/' + id, { method: 'DELETE' });
+        const d = await r.json();
+        if (d.ok) {
+          showToast('Удалено');
+          await loadAdmins();
+        } else showToast('Ошибка: ' + d.error);
+      }
+
+      async function changePass(id, name) {
+        const newPass = prompt(`Новый пароль для "${name}":`);
+        if (!newPass || newPass.length < 6) {
+          if (newPass !== null) showToast('Пароль минимум 6 символов');
+          return;
+        }
+        const r = await fetch('/admin/api/admins/' + id + '/password', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: newPass }),
+        });
+        const d = await r.json();
+        if (d.ok) showToast('Пароль изменён');
+        else showToast('Ошибка: ' + d.error);
+      }
+
+      // ========================
+      // SIDEBAR MOBILE
+      // ========================
+      function toggleSidebar() {
+        sidebarOpen ? closeSidebar() : openSidebar();
+      }
+      function openSidebar() {
+        sidebarOpen = true;
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('overlay').classList.add('show');
+        document.getElementById('menu-btn').classList.add('open');
+      }
+      function closeSidebar() {
+        sidebarOpen = false;
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('show');
+        document.getElementById('menu-btn').classList.remove('open');
+      }
+
+      // ========================
+      // PREVIEW MOBILE
+      // ========================
+      function toggleMobilePreview() {
+        mobilePreviewOpen ? closeMobilePreview() : openMobilePreview();
+      }
+      function openMobilePreview() {
+        mobilePreviewOpen = true;
+        updatePreview();
+        const p = document.getElementById('preview-pane');
+        p.style.display = 'flex';
+        p.classList.add('mobile-show');
+        document.getElementById('close-preview-btn').style.display = 'block';
+        document.getElementById('preview-toggle').classList.add('active');
+        document.getElementById('preview-toggle').textContent = 'Закрыть';
+      }
+      function closeMobilePreview() {
+        mobilePreviewOpen = false;
+        const p = document.getElementById('preview-pane');
+        p.classList.remove('mobile-show');
+        if (window.innerWidth > 680 && currentKey) p.style.display = 'flex';
+        else p.style.display = 'none';
+        document.getElementById('close-preview-btn').style.display = 'none';
+        document.getElementById('preview-toggle').classList.remove('active');
+        document.getElementById('preview-toggle').textContent = 'Просмотр';
+      }
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 680 && currentKey) {
+          const p = document.getElementById('preview-pane');
+          p.style.display = 'flex';
+          p.classList.remove('mobile-show');
+          mobilePreviewOpen = false;
+        }
+      });
+
+      // ========================
+      // UTILITIES
+      // ========================
+      async function logout() {
+        await fetch('/admin/logout', { method: 'POST' });
+        window.location.href = '/admin/login';
+      }
+
+      function setStatus(text, type = 'ok') {
+        document.getElementById('status-text').textContent = text;
+        document.getElementById('status-dot').className =
+          'status-dot' +
+          (type === 'error' ? ' error' : type === 'warn' ? ' warn' : '');
+      }
+
+      let toastTimer;
+      function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          if (currentKey && modified[currentKey]) saveContent();
+        }
+        if (e.key === 'Escape') {
+          if (mobilePreviewOpen) closeMobilePreview();
+          if (sidebarOpen) closeSidebar();
+        }
+      });
+
+      init();
+    </script>
+  </body>
+</html>
