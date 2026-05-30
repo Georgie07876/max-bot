@@ -10,6 +10,8 @@ import {
   Res,
   UseGuards,
   HttpCode,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import * as path from 'path';
@@ -18,7 +20,6 @@ import { AdminGuard, SuperAdminGuard } from './admin.guard';
 import { AdminService } from './admin.service';
 import { ContentService } from '../content/content.service';
 import { MenuService } from '../bot/menu.service';
-// import '../../src/types/session';
 
 @Controller('admin')
 export class AdminController {
@@ -31,7 +32,7 @@ export class AdminController {
   // ── СТРАНИЦА ВХОДА ────────────────────────────────────────────
 
   @Get('login')
-  showLogin(@Res() res: Response) {
+  showLogin(@Res() res: Response): void {
     res.send(`<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -72,10 +73,13 @@ document.getElementById('form').addEventListener('submit', async (e) => {
   const r = await fetch('/admin/login', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ username: document.getElementById('uname').value, password: document.getElementById('pwd').value })
+    body: JSON.stringify({
+      username: document.getElementById('uname').value,
+      password: document.getElementById('pwd').value
+    })
   });
   if (r.ok) { window.location.href = '/admin'; }
-  else { document.getElementById('err').classList.add('show'); document.getElementById('pwd').value=''; }
+  else { document.getElementById('err').classList.add('show'); document.getElementById('pwd').value = ''; }
 });
 </script>
 </body>
@@ -86,65 +90,82 @@ document.getElementById('form').addEventListener('submit', async (e) => {
 
   @Post('login')
   @HttpCode(200)
-  login(
+  async login(
     @Body() body: { username: string; password: string },
     @Req() req: Request,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     const { username, password } = body;
 
-    // Проверяем SuperAdmin
+    if (!username || !password) {
+      res.status(400).json({ ok: false, error: 'Логин и пароль обязательны' });
+      return;
+    }
+
+    // SuperAdmin — синхронная проверка через timingSafeEqual
     if (this.adminService.validateSuperAdmin(username, password)) {
       req.session.role = 'superAdmin';
       req.session.username = username;
-      return res.json({ ok: true, role: 'superAdmin' });
+      res.json({ ok: true, role: 'superAdmin' });
+      return;
     }
 
-    // Проверяем обычного Admin
-    const user = this.adminService.validateAdmin(username, password);
+    // Admin — асинхронная проверка через bcrypt.compare
+    const user = await this.adminService.validateAdmin(username, password);
     if (user) {
       req.session.role = 'admin';
       req.session.username = user.username;
-      return res.json({ ok: true, role: 'admin' });
+      res.json({ ok: true, role: 'admin' });
+      return;
     }
 
-    return res.status(401).json({ ok: false });
+    res.status(401).json({ ok: false });
   }
 
   @Post('logout')
   @HttpCode(200)
-  logout(@Req() req: Request, @Res() res: Response) {
+  logout(@Req() req: Request, @Res() res: Response): void {
     req.session.destroy((err) => {
-      if (err) return res.status(500).json({ ok: false });
-      return res.json({ ok: true });
+      if (err) {
+        res.status(500).json({ ok: false });
+        return;
+      }
+      res.json({ ok: true });
     });
   }
 
   // ── ГЛАВНАЯ СТРАНИЦА ──────────────────────────────────────────
 
   @Get()
-  showAdmin(@Req() req: Request, @Res() res: Response) {
-    if (!req.session?.role) return res.redirect('/admin/login');
+  showAdmin(@Req() req: Request, @Res() res: Response): void {
+    if (!req.session?.role) {
+      res.redirect('/admin/login');
+      return;
+    }
     const htmlPath = path.resolve(__dirname, 'admin.html');
-    if (fs.existsSync(htmlPath)) return res.sendFile(htmlPath);
-    return res.sendFile(
-      path.resolve(process.cwd(), 'src', 'admin', 'admin.html'),
-    );
+    if (fs.existsSync(htmlPath)) {
+      res.sendFile(htmlPath);
+      return;
+    }
+    res.sendFile(path.resolve(process.cwd(), 'src', 'admin', 'admin.html'));
   }
 
   // ── API: СЕССИЯ ───────────────────────────────────────────────
 
   @Get('api/session')
   @UseGuards(AdminGuard)
-  getSession(@Req() req: Request) {
-    return { role: req.session.role, username: req.session.username };
+  getSession(@Req() req: Request): { role: string; username: string } {
+    return {
+      role: req.session.role as string,
+      username: req.session.username as string,
+    };
   }
 
   // ── API: КОНТЕНТ ──────────────────────────────────────────────
 
   @Get('api/content')
   @UseGuards(AdminGuard)
-  getContent() {
+  getContent(): Record<string, string> {
     return this.contentService.getAll();
   }
 
@@ -154,16 +175,17 @@ document.getElementById('form').addEventListener('submit', async (e) => {
     @Param('key') key: string,
     @Body() body: { value: string },
     @Req() req: Request,
-  ) {
-    if (!key || body.value === undefined)
-      return { ok: false, error: 'Неверные параметры' };
-
-    const editor = req.session.username || 'admin';
+  ): { ok: boolean; key: string } {
+    if (!key) throw new BadRequestException('Ключ не может быть пустым');
+    if (body.value === undefined || body.value === null) {
+      throw new BadRequestException('Значение обязательно');
+    }
+    const editor = req.session.username ?? 'admin';
     this.contentService.update(key, body.value, editor);
     return { ok: true, key };
   }
 
-  // ── API: МЕНЮ (superAdmin) ────────────────────────────────────
+  // ── API: МЕНЮ ─────────────────────────────────────────────────
 
   @Get('api/menus')
   @UseGuards(AdminGuard)
@@ -176,24 +198,30 @@ document.getElementById('form').addEventListener('submit', async (e) => {
   createMenu(
     @Body() body: { id: string; text: string; parent: string | null },
   ) {
+    if (!body.id || !body.text) {
+      throw new BadRequestException('ID и текст меню обязательны');
+    }
     try {
       this.menuService.addMenu(body.id, body.text, body.parent ?? null);
       return { ok: true };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new BadRequestException(
+        e instanceof Error ? e.message : 'Ошибка создания меню',
+      );
     }
   }
 
   @Put('api/menus/:id/text')
   @UseGuards(SuperAdminGuard)
   updateMenuText(@Param('id') id: string, @Body() body: { text: string }) {
+    if (!body.text) throw new BadRequestException('Текст не может быть пустым');
     try {
       this.menuService.updateMenuText(id, body.text);
       return { ok: true };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new NotFoundException(
+        e instanceof Error ? e.message : 'Ошибка обновления',
+      );
     }
   }
 
@@ -201,11 +229,13 @@ document.getElementById('form').addEventListener('submit', async (e) => {
   @UseGuards(SuperAdminGuard)
   deleteMenu(@Param('id') id: string) {
     try {
-      this.adminService.deleteAdmin(id);
+      // ИСПРАВЛЕНО (v1): было adminService.deleteAdmin(id)
+      this.menuService.deleteMenu(id);
       return { ok: true };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new NotFoundException(
+        e instanceof Error ? e.message : 'Ошибка удаления',
+      );
     }
   }
 
@@ -215,6 +245,9 @@ document.getElementById('form').addEventListener('submit', async (e) => {
     @Param('id') menuId: string,
     @Body() body: { label: string; type: 'callback' | 'url'; value: string },
   ) {
+    if (!body.label || !body.value) {
+      throw new BadRequestException('Текст и значение кнопки обязательны');
+    }
     try {
       const btn = this.menuService.addButton(
         menuId,
@@ -224,8 +257,9 @@ document.getElementById('form').addEventListener('submit', async (e) => {
       );
       return { ok: true, button: btn };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new BadRequestException(
+        e instanceof Error ? e.message : 'Ошибка добавления кнопки',
+      );
     }
   }
 
@@ -246,8 +280,9 @@ document.getElementById('form').addEventListener('submit', async (e) => {
       );
       return { ok: true };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new NotFoundException(
+        e instanceof Error ? e.message : 'Ошибка обновления кнопки',
+      );
     }
   }
 
@@ -258,8 +293,9 @@ document.getElementById('form').addEventListener('submit', async (e) => {
       this.menuService.deleteButton(menuId, btnId);
       return { ok: true };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new NotFoundException(
+        e instanceof Error ? e.message : 'Ошибка удаления кнопки',
+      );
     }
   }
 
@@ -270,11 +306,14 @@ document.getElementById('form').addEventListener('submit', async (e) => {
     @Param('btnId') btnId: string,
     @Body() body: { direction: 'up' | 'down' },
   ) {
+    if (body.direction !== 'up' && body.direction !== 'down') {
+      throw new BadRequestException('direction должен быть "up" или "down"');
+    }
     this.menuService.moveButton(menuId, btnId, body.direction);
     return { ok: true };
   }
 
-  // ── API: АДМИНИСТРАТОРЫ (только superAdmin) ───────────────────
+  // ── API: АДМИНИСТРАТОРЫ ───────────────────────────────────────
 
   @Get('api/admins')
   @UseGuards(SuperAdminGuard)
@@ -284,25 +323,37 @@ document.getElementById('form').addEventListener('submit', async (e) => {
 
   @Post('api/admins')
   @UseGuards(SuperAdminGuard)
-  createAdmin(@Body() body: { username: string; password: string }) {
+  async createAdmin(@Body() body: { username: string; password: string }) {
+    if (!body.username || !body.password) {
+      throw new BadRequestException('Логин и пароль обязательны');
+    }
     try {
-      const user = this.adminService.createAdmin(body.username, body.password);
+      const user = await this.adminService.createAdmin(
+        body.username,
+        body.password,
+      );
       return { ok: true, user };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new BadRequestException(
+        e instanceof Error ? e.message : 'Ошибка создания',
+      );
     }
   }
 
   @Put('api/admins/:id/password')
   @UseGuards(SuperAdminGuard)
-  changePassword(@Param('id') id: string, @Body() body: { password: string }) {
+  async changePassword(
+    @Param('id') id: string,
+    @Body() body: { password: string },
+  ) {
+    if (!body.password) {
+      throw new BadRequestException('Пароль не может быть пустым');
+    }
     try {
-      this.adminService.changePassword(id, body.password);
+      await this.adminService.changePassword(id, body.password);
       return { ok: true };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new NotFoundException(e instanceof Error ? e.message : 'Ошибка');
     }
   }
 
@@ -313,14 +364,16 @@ document.getElementById('form').addEventListener('submit', async (e) => {
       this.adminService.deleteAdmin(id);
       return { ok: true };
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      return { ok: false, error: message };
+      throw new NotFoundException(e instanceof Error ? e.message : 'Ошибка');
     }
   }
 
   @Get('*path')
-  catchAll(@Req() req: Request, @Res() res: Response) {
-    if (!req.session?.role) return res.redirect('/admin/login');
-    return res.status(404).send('Страница не найдена');
+  catchAll(@Req() req: Request, @Res() res: Response): void {
+    if (!req.session?.role) {
+      res.redirect('/admin/login');
+      return;
+    }
+    res.status(404).send('Страница не найдена');
   }
 }

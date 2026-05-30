@@ -1,10 +1,46 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:alpine
-    container_name: rinh_assistant_redis
+  # ──────────────────────────────────────────────────
+  # ПРИЛОЖЕНИЕ
+  # ──────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rinh_assistant_app
+    restart: unless-stopped
     ports:
-      - "6379:6379"
-    restart: always
-   
+      - '${PORT:-3000}:3000'
+    environment:
+      - NODE_ENV=production
+      - BOT_TOKEN=${BOT_TOKEN}
+      - SUPER_ADMIN_USERNAME=${SUPER_ADMIN_USERNAME}
+      - SUPER_ADMIN_PASSWORD=${SUPER_ADMIN_PASSWORD}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
+    volumes:
+      - ./data:/app/data # персистентность JSON-файлов
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # ──────────────────────────────────────────────────
+  # REDIS
+  # ──────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: rinh_assistant_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes # персистентность Redis
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:

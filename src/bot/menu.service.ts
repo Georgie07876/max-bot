@@ -5,13 +5,13 @@ import { randomUUID } from 'crypto';
 
 export interface MenuButton {
   id: string; // уникальный идентификатор кнопки
-  label: string; // текст на кнопке (с эмодзи)
+  label: string; // текст на кнопке с эмодзи
   type: 'callback' | 'url';
   value: string; // callback_data или URL
 }
 
 export interface MenuItem {
-  text: string; // текст над кнопками
+  text: string;
   parent: string | null; // ID родительского меню (для кнопки "Назад")
   buttons: MenuButton[];
 }

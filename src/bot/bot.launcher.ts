@@ -1,21 +1,22 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { Bot, Context, Keyboard } from '@maxhub/max-bot-api';
 import { BotService } from './bot.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BotLauncher implements OnModuleInit {
   private readonly logger = new Logger(BotLauncher.name);
   private bot: Bot<Context>;
 
-  constructor(private readonly botService: BotService) {
-    const token = process.env.BOT_TOKEN;
-    if (!token) throw new Error('BOT_TOKEN не задан в .env');
-    this.bot = new Bot<Context>(
-      'f9LHodD0cOKNe1V91C1ebG2JOeXTPNNLxh7o0XKrkgqmv74UcyaV7EJe6aDyx5U7tqG14T9VmpikSeqZAV-m',
-    );
+  constructor(
+    private readonly botService: BotService,
+    private readonly configService: ConfigService,
+  ) {
+    const token = this.configService.getOrThrow<string>('BOT_TOKEN');
+    this.bot = new Bot<Context>(token);
   }
 
-  private async sendWelcome(ctx: Context) {
+  private async sendWelcome(ctx: Context): Promise<void> {
     try {
       const userId = ctx.user?.user_id ? String(ctx.user.user_id) : 'unknown';
       const userName = ctx.user?.name || ctx.user?.username || 'студент';
@@ -35,7 +36,7 @@ export class BotLauncher implements OnModuleInit {
     }
   }
 
-  onModuleInit() {
+  onModuleInit(): void {
     this.logger.log('Инициализация МАКС бота...');
 
     this.bot.use(async (ctx, next) => {
@@ -46,6 +47,7 @@ export class BotLauncher implements OnModuleInit {
     this.bot.command('start', async (ctx) => {
       await this.sendWelcome(ctx);
     });
+
     this.bot.on('bot_started', async (ctx) => {
       await this.sendWelcome(ctx);
     });

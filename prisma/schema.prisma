@@ -1,0 +1,47 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library" 
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Таблица администраторов (из файла admins.json)
+model Admin {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String   // Хэш bcrypt (поле passwordHash в твоем JSON)
+  role      String   // 'admin' или 'superAdmin'
+  createdAt DateTime @default(now())
+}
+
+// Таблица для простых текстовых блоков и ссылок (из файла content.json)
+model ContentBlock {
+  id          String   @id // Ключ из content.json (например, "welcome_message")
+  text        String
+  description String?  
+  updatedAt   DateTime @updatedAt
+}
+
+// Таблица для страниц меню (ключи из menus.json, например "main_menu")
+model MenuPage {
+  id        String       @id // Уникальный ID меню (строка, латиница)
+  text      String       // Текст сообщения, который отправляет бот
+  parent    String?      // ID родительского меню для кнопки "Назад"
+  buttons   MenuButton[] // Связь: массив кнопок внутри этого меню
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+// Таблица для инлайн-кнопок меню
+model MenuButton {
+  id        String   @id @default(uuid())
+  label     String   // Текст на кнопке (например, "Институты 🏛️")
+  type      String   // 'callback' или 'url'
+  value     String   // callback_data (ID меню) или ссылка на сайт
+  position  Int      @default(0) // Порядок отображения кнопок сверху вниз
+  
+  menuId    String
+  menu      MenuPage @relation(fields: [menuId], references: [id], onDelete: Cascade)
+}

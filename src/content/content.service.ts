@@ -47,28 +47,20 @@ export class ContentService implements OnModuleInit {
   update(key: string, value: string, adminName = 'admin'): void {
     const oldValue = this.cache[key] ?? '';
     this.cache[key] = value;
-    this.saveToDisk();
+    void this.saveToDisk();
     this.appendLog(key, oldValue, value, adminName);
     this.logger.log(`Обновлён ключ "${key}" администратором "${adminName}"`);
   }
 
-  private saveToDisk(): void {
+  private async saveToDisk(): Promise<void> {
     try {
-      // Создаём резервную копию перед сохранением
-      if (fs.existsSync(this.filePath)) {
-        fs.mkdirSync(this.backupDir, { recursive: true });
-        const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        const backupPath = path.join(this.backupDir, `content_${ts}.json`);
-        fs.copyFileSync(this.filePath, backupPath);
-        this.cleanOldBackups();
-      }
-      fs.writeFileSync(
+      await fs.promises.writeFile(
         this.filePath,
         JSON.stringify(this.cache, null, 2),
         'utf-8',
       );
     } catch (err) {
-      this.logger.error('Ошибка сохранения контента:', err);
+      this.logger.error('Ошибка записи контента на диск:', err);
     }
   }
 

@@ -1,33 +1,28 @@
+удар cat > /mnt/user-data/outputs/admin.html << 'HTMLEOF'
 <!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-    />
-    <title>Панель управления РГЭУ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Панель управления — РГЭУ</title>
     <style>
-      /* ===== RESET ===== */
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        -webkit-tap-highlight-color: transparent;
       }
       body {
         font-family:
           system-ui,
           -apple-system,
           sans-serif;
-        background: #f5f5f0;
+        font-size: 13px;
         color: #1a1a1a;
         height: 100dvh;
         display: flex;
         flex-direction: column;
         overflow: hidden;
       }
-
       /* ===== TOPBAR ===== */
       .topbar {
         height: 52px;
@@ -107,7 +102,6 @@
       .menu-btn.open span:nth-child(3) {
         transform: translateY(-7px) rotate(-45deg);
       }
-
       /* ===== TABS ===== */
       .tabs {
         height: 40px;
@@ -143,7 +137,6 @@
       .tab-icon {
         font-size: 14px;
       }
-
       /* ===== LAYOUT ===== */
       .layout {
         display: flex;
@@ -151,7 +144,6 @@
         overflow: hidden;
         position: relative;
       }
-
       /* ===== SIDEBAR ===== */
       .sidebar {
         width: 268px;
@@ -192,7 +184,6 @@
         background: #ddd;
         border-radius: 2px;
       }
-
       /* ===== ACCORDION ===== */
       .acc-group {
       }
@@ -227,8 +218,6 @@
       .acc-body.open {
         display: block;
       }
-
-      /* Sub-accordion (level 2) */
       .acc-sub-header {
         padding: 7px 14px 7px 20px;
         font-size: 12px;
@@ -258,7 +247,38 @@
       .acc-sub-body.open {
         display: block;
       }
-
+      .acc-sub-sub-header {
+        padding: 6px 14px 6px 34px;
+        font-size: 11px;
+        font-weight: 500;
+        color: #aaa;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        transition: background 0.1s;
+        border-left: 1px dashed #eee;
+        margin-left: 20px;
+      }
+      .acc-sub-sub-header:hover {
+        background: #f5f5f0;
+        color: #666;
+      }
+      .acc-sub-sub-header .chevron {
+        font-size: 8px;
+        transition: transform 0.2s;
+        color: #ddd;
+      }
+      .acc-sub-sub-header.open .chevron {
+        transform: rotate(90deg);
+      }
+      .acc-sub-sub-body {
+        display: none;
+      }
+      .acc-sub-sub-body.open {
+        display: block;
+      }
       /* Nav items */
       .nav-item {
         padding: 7px 16px 7px 28px;
@@ -268,9 +288,16 @@
         border-left: 2px solid transparent;
         transition: background 0.1s;
         line-height: 1.4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px;
       }
       .nav-item.l1 {
         padding-left: 16px;
+      }
+      .nav-item.l3 {
+        padding-left: 38px;
       }
       .nav-item:hover {
         background: #f5f5f0;
@@ -290,7 +317,20 @@
         color: #f59e0b;
         font-size: 10px;
       }
-
+      .url-badge {
+        font-size: 9px;
+        padding: 1px 5px;
+        border-radius: 3px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-weight: 600;
+      }
+      .nav-item.active .url-badge {
+        background: #dbeafe;
+        color: #1e40af;
+      }
       /* ===== SIDEBAR OVERLAY ===== */
       .sidebar-overlay {
         display: none;
@@ -302,7 +342,6 @@
       .sidebar-overlay.show {
         display: block;
       }
-
       /* ===== MAIN ===== */
       .main {
         flex: 1;
@@ -312,7 +351,6 @@
         background: #fafaf8;
         min-width: 0;
       }
-
       /* ===== MAIN HEADER ===== */
       .main-header {
         background: #fff;
@@ -417,211 +455,190 @@
         border-color: #1d9e75;
         color: #0f6e56;
       }
-
       /* ===== EDITOR ===== */
       .editor-area {
         flex: 1;
         display: flex;
         overflow: hidden;
       }
-      .editor-pane {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        padding: 12px 14px;
-        min-width: 0;
-      }
-      .pane-label {
-        font-size: 10px;
-        color: #aaa;
-        margin-bottom: 6px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
-      .editor-textarea {
-        flex: 1;
-        resize: none;
-        border: 1px solid #e0e0dc;
-        border-radius: 8px;
-        padding: 12px 14px;
-        font-family: 'Courier New', monospace;
-        font-size: 13px;
-        background: #fff;
-        color: #1a1a1a;
-        outline: none;
-        line-height: 1.7;
-        -webkit-overflow-scrolling: touch;
-      }
-      .editor-textarea:focus {
-        border-color: #1d9e75;
-      }
-      .preview-pane {
-        width: 280px;
-        flex-shrink: 0;
-        border-left: 1px solid #e8e8e4;
-        padding: 12px 14px;
-        display: flex;
-        flex-direction: column;
-        background: #fff;
-      }
-      .preview-content {
-        flex: 1;
-        overflow-y: auto;
-        font-size: 13px;
-        line-height: 1.7;
-        color: #333;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-
-      /* ===== EMPTY STATE ===== */
       .empty-state {
         flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #ccc;
-        gap: 8px;
-        padding: 20px;
+        gap: 12px;
+        color: #bbb;
+        padding: 24px;
+        text-align: center;
       }
       .empty-state p {
-        font-size: 14px;
+        font-size: 15px;
         color: #aaa;
       }
       .empty-state small {
         font-size: 12px;
-        color: #bbb;
-        text-align: center;
       }
-
-      /* ===== PANELS (Меню и Администраторы) ===== */
+      .editor-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+        gap: 8px;
+        overflow: hidden;
+        min-width: 0;
+      }
+      .preview-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+        gap: 8px;
+        overflow-y: auto;
+        border-left: 1px solid #e8e8e4;
+        min-width: 0;
+      }
+      .pane-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+      }
+      .editor-textarea {
+        flex: 1;
+        border: 1px solid #e0e0dc;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 13px;
+        font-family: 'Courier New', monospace;
+        line-height: 1.6;
+        resize: none;
+        outline: none;
+        background: #fff;
+      }
+      .editor-textarea:focus {
+        border-color: #1d9e75;
+      }
+      .preview-content {
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.7;
+        color: #333;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      /* ===== URL EDITOR PANE ===== */
+      .url-editor-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        overflow-y: auto;
+      }
+      .url-editor-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .url-type-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 5px;
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+      .url-editor-desc {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+      }
+      .url-input-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .url-input {
+        padding: 10px 12px;
+        border: 1px solid #e0e0dc;
+        border-radius: 8px;
+        font-size: 13px;
+        outline: none;
+        font-family: 'Courier New', monospace;
+        width: 100%;
+        background: #fff;
+      }
+      .url-input:focus {
+        border-color: #1d9e75;
+      }
+      .url-preview-link {
+        font-size: 12px;
+        color: #1d4ed8;
+        word-break: break-all;
+        display: none;
+        padding: 8px 12px;
+        background: #eff6ff;
+        border-radius: 6px;
+        text-decoration: none;
+      }
+      .url-preview-link:hover {
+        text-decoration: underline;
+      }
+      .url-note {
+        font-size: 12px;
+        color: #aaa;
+        line-height: 1.5;
+      }
+      /* ===== PANEL (menus/admins) ===== */
       .panel {
         flex: 1;
         overflow-y: auto;
-        padding: 20px;
-        -webkit-overflow-scrolling: touch;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
       }
       .panel-section {
         background: #fff;
-        border-radius: 10px;
         border: 1px solid #e8e8e4;
-        margin-bottom: 16px;
+        border-radius: 10px;
         overflow: hidden;
       }
       .panel-section-header {
         padding: 12px 16px;
         font-size: 13px;
         font-weight: 600;
-        border-bottom: 1px solid #f0f0ec;
+        border-bottom: 1px solid #e8e8e4;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 8px;
       }
       .panel-section-body {
-        padding: 14px 16px;
-      }
-
-      /* Menu tree */
-      .menu-tree-item {
-        border: 1px solid #e8e8e4;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        overflow: hidden;
-      }
-      .menu-tree-header {
-        padding: 10px 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        background: #f9f9f6;
-        font-size: 13px;
-        font-weight: 500;
-      }
-      .menu-tree-header:hover {
-        background: #f0faf5;
-      }
-      .menu-id {
-        font-family: 'Courier New', monospace;
-        font-size: 11px;
-        background: #e8e8e4;
-        padding: 1px 6px;
-        border-radius: 3px;
-        color: #666;
-      }
-      .menu-tree-body {
-        display: none;
-        padding: 10px 12px;
-        border-top: 1px solid #f0f0ec;
-      }
-      .menu-tree-body.open {
-        display: block;
-      }
-      .btn-list {
+        padding: 12px 16px;
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        margin-bottom: 10px;
+        gap: 8px;
       }
-      .btn-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 7px 10px;
-        background: #f9f9f6;
-        border-radius: 6px;
-        font-size: 12px;
-      }
-      .btn-row-label {
-        flex: 1;
-        color: #333;
-      }
-      .btn-row-type {
-        font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 3px;
-        background: #e0e0dc;
-        color: #666;
-      }
-      .btn-row-type.url {
-        background: #dbeafe;
-        color: #1e40af;
-      }
-      .btn-move {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #aaa;
-        padding: 2px 4px;
-        font-size: 13px;
-        border-radius: 3px;
-      }
-      .btn-move:hover {
-        background: #eee;
-        color: #444;
-      }
-
-      /* Form row */
       .form-row {
         display: flex;
-        gap: 8px;
-        align-items: flex-end;
+        gap: 10px;
         flex-wrap: wrap;
-        margin-top: 10px;
+        align-items: flex-start;
       }
       .form-group {
         display: flex;
         flex-direction: column;
         gap: 4px;
         flex: 1;
-        min-width: 100px;
+        min-width: 120px;
       }
       .form-label {
         font-size: 11px;
-        color: #888;
         font-weight: 500;
+        color: #888;
       }
       .form-input {
         padding: 7px 10px;
@@ -629,6 +646,7 @@
         border-radius: 6px;
         font-size: 13px;
         outline: none;
+        width: 100%;
       }
       .form-input:focus {
         border-color: #1d9e75;
@@ -641,8 +659,86 @@
         outline: none;
         background: #fff;
       }
-
-      /* Admin list */
+      .menu-tree-item {
+        border: 1px solid #e8e8e4;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        overflow: hidden;
+      }
+      .menu-tree-header {
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        background: #fafaf8;
+      }
+      .menu-tree-header:hover {
+        background: #f5f5f0;
+      }
+      .menu-tree-body {
+        padding: 12px;
+        border-top: 1px solid #e8e8e4;
+        display: none;
+      }
+      .menu-tree-body.open {
+        display: block;
+      }
+      .menu-id {
+        font-family: monospace;
+        font-size: 12px;
+        background: #f0f0ec;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      .btn-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+      .btn-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        background: #f9f9f6;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+      .btn-row-label {
+        flex: 1;
+        font-weight: 500;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .btn-row-type {
+        font-size: 10px;
+        padding: 1px 5px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+      .btn-row-type.callback {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .btn-row-type.url {
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+      .btn-move {
+        padding: 3px 7px;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .btn-move:hover {
+        background: #f0f0ec;
+      }
       .admin-row {
         display: flex;
         align-items: center;
@@ -668,7 +764,6 @@
         background: #d1fae5;
         color: #065f46;
       }
-
       /* ===== STATUS BAR ===== */
       .statusbar {
         height: 28px;
@@ -706,7 +801,6 @@
         color: #aaa;
         white-space: nowrap;
       }
-
       /* ===== TOAST ===== */
       .toast {
         position: fixed;
@@ -728,7 +822,6 @@
         opacity: 1;
         transform: translateX(-50%) translateY(0);
       }
-
       /* ===== MOBILE ===== */
       @media (max-width: 680px) {
         .menu-btn {
@@ -834,7 +927,7 @@
 
     <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-    <!-- ===== CONTENT TAB ===== -->
+    <!-- CONTENT TAB -->
     <div class="layout" id="pane-content">
       <div class="sidebar" id="sidebar">
         <div class="sidebar-search">
@@ -887,6 +980,8 @@
             <p>Выберите раздел</p>
             <small>Нажмите ☰ или выберите пункт слева</small>
           </div>
+
+          <!-- TEXT EDITOR -->
           <div class="editor-pane" id="editor-pane" style="display: none">
             <div class="pane-label">Markdown-текст (эмодзи поддерживаются)</div>
             <textarea
@@ -897,6 +992,48 @@
               spellcheck="false"
             ></textarea>
           </div>
+
+          <!-- URL EDITOR (новый) -->
+          <div
+            class="url-editor-pane"
+            id="url-editor-pane"
+            style="display: none"
+          >
+            <div class="url-editor-header">
+              <span class="url-type-badge">URL</span>
+              <span style="font-size: 14px; font-weight: 500; color: #1a1a1a"
+                >Ссылка кнопки в боте</span
+              >
+            </div>
+            <p class="url-editor-desc">
+              Это URL-адрес, на который ведёт кнопка в меню бота.<br />
+              После сохранения ссылка обновится мгновенно.
+            </p>
+            <div class="url-input-wrap">
+              <div class="pane-label">URL-адрес</div>
+              <input
+                type="url"
+                id="url-input"
+                class="url-input"
+                placeholder="https://..."
+                oninput="onUrlEdit()"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+            <a
+              id="url-preview-link"
+              class="url-preview-link"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Открыть ссылку ↗</a
+            >
+            <p class="url-note">
+              Поддерживаются любые URL: https://, vk.com, t.me и др.
+            </p>
+          </div>
+
           <div class="preview-pane" id="preview-pane" style="display: none">
             <div
               class="pane-label"
@@ -933,12 +1070,12 @@
       </div>
     </div>
 
-    <!-- ===== MENUS TAB ===== -->
+    <!-- MENUS TAB -->
     <div class="layout" id="pane-menus" style="display: none">
       <div class="panel" id="menus-panel"></div>
     </div>
 
-    <!-- ===== ADMINS TAB ===== -->
+    <!-- ADMINS TAB -->
     <div class="layout" id="pane-admins" style="display: none">
       <div class="panel" id="admins-panel"></div>
     </div>
@@ -953,204 +1090,240 @@
       let currentUsername = '';
       let allContent = {};
       let allMenus = {};
+      let allUrlButtons = {}; // ← карта URL-кнопок: key → { label, url, menuId, btnId, menuLabel }
       let currentKey = null;
       let modified = {};
+      let modifiedUrls = {}; // ← несохранённые изменения URL
       let mobilePreviewOpen = false;
       let sidebarOpen = false;
       let currentTab = 'content';
+      const openGroups = new Set();
+      const openSubs = new Set();
+      const openSubSubs = new Set();
 
       // ========================
       // ACCORDION CONFIG
       // ========================
       const ACCORDION = [
         {
-          label: 'Факультеты',
-          items: [
-            {
-              key: 'fac_management',
-              label: 'Менеджмента и предпринимательства',
-            },
-            { key: 'fac_trade', label: 'Торгового дела' },
-            { key: 'fac_it', label: 'КТиИБ' },
-            { key: 'fac_accounting', label: 'Учетно-экономический' },
-            { key: 'fac_economics', label: 'Экономики и финансов' },
-            { key: 'fac_law', label: 'Юридический' },
-            { key: 'fac_linguistics', label: 'Лингвистики и журналистики' },
-          ],
-        },
-        {
-          label: 'Кафедры',
+          label: '☎️ Контакты',
           sub: [
             {
-              label: 'МиП',
+              label: '👩🏻‍🎓 Факультеты',
               items: [
-                { key: 'dep_mip_hr', label: 'Финансовый и HR менеджмент' },
                 {
-                  key: 'dep_mip_strat',
-                  label: 'Общий и стратегический менедж.',
+                  key: 'fac_management',
+                  label: 'МиП — Менеджмент и предпринимательство',
                 },
+                { key: 'fac_trade', label: 'ТД — Торговое дело' },
+                { key: 'fac_it', label: 'КТиИБ' },
+                { key: 'fac_accounting', label: 'УЭФ — Учётно-экономический' },
+                { key: 'fac_economics', label: 'ЭиФ — Экономика и финансы' },
+                { key: 'fac_law', label: 'Юридический' },
                 {
-                  key: 'dep_mip_gmu',
-                  label: 'ГМУ и экономическая безопасность',
-                },
-                { key: 'dep_mip_innov', label: 'Инновационный менеджмент' },
-                {
-                  key: 'dep_mip_anticrisis',
-                  label: 'Антикризисное и корп. управление',
+                  key: 'fac_linguistics',
+                  label: 'ЛиЖ — Лингвистика и журналистика',
                 },
               ],
             },
             {
-              label: 'Торгового дела',
-              items: [
-                { key: 'dep_td_phil', label: 'Философия и культурология' },
-                { key: 'dep_td_comm', label: 'Коммерция и логистика' },
-                { key: 'dep_td_mark', label: 'Маркетинг и реклама' },
+              label: '📈 Кафедры',
+              sub: [
                 {
-                  key: 'dep_td_customs',
-                  label: 'Международная торговля и таможня',
+                  label: 'МиП',
+                  items: [
+                    { key: 'dep_mip_hr', label: 'Финансовый и HR менеджмент' },
+                    {
+                      key: 'dep_mip_strat',
+                      label: 'Общий и стратегический менедж.',
+                    },
+                    {
+                      key: 'dep_mip_gmu',
+                      label: 'ГМУ и экономическая безопасность',
+                    },
+                    { key: 'dep_mip_innov', label: 'Инновационный менеджмент' },
+                    {
+                      key: 'dep_mip_anticrisis',
+                      label: 'Антикризисное и корп. управление',
+                    },
+                  ],
                 },
-                { key: 'dep_td_theory', label: 'Экономическая теория' },
                 {
-                  key: 'dep_td_quality',
-                  label: 'Товароведение и управление качеством',
+                  label: 'Торгового дела',
+                  items: [
+                    { key: 'dep_td_phil', label: 'Философия и культурология' },
+                    { key: 'dep_td_comm', label: 'Коммерция и логистика' },
+                    { key: 'dep_td_mark', label: 'Маркетинг и реклама' },
+                    {
+                      key: 'dep_td_customs',
+                      label: 'Международная торговля и таможня',
+                    },
+                    { key: 'dep_td_theory', label: 'Экономическая теория' },
+                    {
+                      key: 'dep_td_quality',
+                      label: 'Товароведение и управление качеством',
+                    },
+                  ],
+                },
+                {
+                  label: 'КТиИБ',
+                  items: [
+                    {
+                      key: 'dep_ktib_is',
+                      label: 'Инф. системы и прикл. информатика',
+                    },
+                    {
+                      key: 'dep_ktib_ai',
+                      label: 'Прикл. математика и технологии ИИ',
+                    },
+                    {
+                      key: 'dep_ktib_it',
+                      label: 'Информационные технологии и прогр.',
+                    },
+                    {
+                      key: 'dep_ktib_sec',
+                      label: 'Информационная безопасность',
+                    },
+                    { key: 'dep_ktib_sport', label: 'Физвоспитание и спорт' },
+                  ],
+                },
+                {
+                  label: 'УЭФ',
+                  items: [
+                    { key: 'dep_uef_acc', label: 'Бухгалтерский учёт' },
+                    { key: 'dep_uef_audit', label: 'Аудит' },
+                    {
+                      key: 'dep_uef_analysis',
+                      label: 'Анализ хоз. деятельности',
+                    },
+                    { key: 'dep_uef_stat', label: 'Статистика и эконометрика' },
+                    {
+                      key: 'dep_uef_world',
+                      label: 'Мировая экономика и межд. отношения',
+                    },
+                  ],
+                },
+                {
+                  label: 'ЭиФ',
+                  items: [
+                    { key: 'dep_eif_bank', label: 'Банковское дело' },
+                    { key: 'dep_eif_fin', label: 'Финансы' },
+                    { key: 'dep_eif_tax', label: 'Налоги и налогообложение' },
+                    { key: 'dep_eif_monit', label: 'Финансовый мониторинг' },
+                    {
+                      key: 'dep_eif_reg',
+                      label: 'Экономика региона, отраслей и предпр.',
+                    },
+                  ],
+                },
+                {
+                  label: 'Юридического',
+                  items: [
+                    { key: 'dep_law_civ', label: 'Гражданское право' },
+                    {
+                      key: 'dep_law_hist',
+                      label: 'Исторические науки и политология',
+                    },
+                    {
+                      key: 'dep_law_const',
+                      label: 'Конституционное и муниц. право',
+                    },
+                    {
+                      key: 'dep_law_crim_exp',
+                      label: 'Судебная экспертиза и криминалистика',
+                    },
+                    {
+                      key: 'dep_law_theory',
+                      label: 'Теория и история государства и права',
+                    },
+                    {
+                      key: 'dep_law_crim',
+                      label: 'Уголовное право и криминология',
+                    },
+                    {
+                      key: 'dep_law_fin',
+                      label: 'Финансовое и административное право',
+                    },
+                    { key: 'dep_law_proc', label: 'Процессуальное право' },
+                  ],
+                },
+                {
+                  label: 'ЛиЖ',
+                  items: [
+                    {
+                      key: 'dep_lizh_econ',
+                      label: 'Ин. языки для экон. специальностей',
+                    },
+                    {
+                      key: 'dep_lizh_hum',
+                      label: 'Ин. языки для гум. специальностей',
+                    },
+                    { key: 'dep_lizh_journ', label: 'Журналистика' },
+                    {
+                      key: 'dep_lizh_ling',
+                      label: 'Лингвистика и межкульт. коммуникация',
+                    },
+                    {
+                      key: 'dep_lizh_rus',
+                      label: 'Русский язык и культура речи',
+                    },
+                  ],
                 },
               ],
             },
             {
-              label: 'КТиИБ',
+              label: '🎓 Институт магистратуры',
               items: [
-                {
-                  key: 'dep_ktib_is',
-                  label: 'Инф. системы и прикл. информатика',
-                },
-                {
-                  key: 'dep_ktib_ai',
-                  label: 'Прикл. математика и технологии ИИ',
-                },
-                {
-                  key: 'dep_ktib_it',
-                  label: 'Информационные технологии и прогр.',
-                },
-                { key: 'dep_ktib_sec', label: 'Информационная безопасность' },
-                { key: 'dep_ktib_sport', label: 'Физвоспитание и спорт' },
+                { key: 'contacts_masters', label: 'Институт магистратуры' },
               ],
             },
             {
-              label: 'УЭФ',
+              label: '🧠 Аспирантура и докторантура',
               items: [
-                { key: 'dep_uef_acc', label: 'Бухгалтерский учёт' },
-                { key: 'dep_uef_audit', label: 'Аудит' },
-                { key: 'dep_uef_analysis', label: 'Анализ хоз. деятельности' },
-                { key: 'dep_uef_stat', label: 'Статистика и эконометрика' },
-                {
-                  key: 'dep_uef_world',
-                  label: 'Мировая экономика и межд. отношения',
-                },
+                { key: 'contacts_phd', label: 'Аспирантура и докторантура' },
               ],
             },
             {
-              label: 'ЭиФ',
+              label: '🛠️ Службы университета',
               items: [
-                { key: 'dep_eif_bank', label: 'Банковское дело' },
-                { key: 'dep_eif_fin', label: 'Финансы' },
-                { key: 'dep_eif_tax', label: 'Налоги и налогообложение' },
-                { key: 'dep_eif_monit', label: 'Финансовый мониторинг' },
                 {
-                  key: 'dep_eif_reg',
-                  label: 'Экономика региона, отраслей и предпр.',
+                  key: 'srv_accounting',
+                  label: 'Управление бухгалтерского учёта',
                 },
+                { key: 'srv_hr', label: 'Управление по персоналу' },
+                { key: 'srv_admission', label: 'Работа с абитуриентами' },
+                { key: 'srv_ic', label: 'Международное сотрудничество' },
+                { key: 'srv_education', label: 'Воспитательная работа' },
+                { key: 'srv_projects', label: 'Центр проектной деятельности' },
+                { key: 'srv_student_bureau', label: 'Студенческое бюро' },
+                { key: 'srv_student_trade', label: 'Профсоюзный комитет' },
               ],
             },
             {
-              label: 'Юридического',
-              items: [
-                { key: 'dep_law_civ', label: 'Гражданское право' },
-                {
-                  key: 'dep_law_hist',
-                  label: 'Исторические науки и политология',
-                },
-                {
-                  key: 'dep_law_const',
-                  label: 'Конституционное и муниц. право',
-                },
-                {
-                  key: 'dep_law_crim_exp',
-                  label: 'Судебная экспертиза и криминалистика',
-                },
-                {
-                  key: 'dep_law_theory',
-                  label: 'Теория и история государства и права',
-                },
-                {
-                  key: 'dep_law_crim',
-                  label: 'Уголовное право и криминология',
-                },
-                {
-                  key: 'dep_law_fin',
-                  label: 'Финансовое и административное право',
-                },
-                { key: 'dep_law_proc', label: 'Процессуальное право' },
-              ],
+              label: '🏠 Общежития',
+              items: [{ key: 'contacts_hostels', label: 'Общежития' }],
             },
             {
-              label: 'ЛиЖ',
+              label: '📚 Библиотеки',
               items: [
+                { key: 'lib_subscriptions', label: 'Абонементы' },
+                { key: 'lib_reading_rooms', label: 'Читальные залы' },
                 {
-                  key: 'dep_lizh_econ',
-                  label: 'Ин. языки для экон. специальностей',
+                  key: 'lib_e_reading_rooms',
+                  label: 'Электронный читальный зал',
                 },
-                {
-                  key: 'dep_lizh_hum',
-                  label: 'Ин. языки для гум. специальностей',
-                },
-                { key: 'dep_lizh_journ', label: 'Журналистика' },
-                {
-                  key: 'dep_lizh_ling',
-                  label: 'Лингвистика и межкульт. коммуникация',
-                },
-                { key: 'dep_lizh_rus', label: 'Русский язык и культура речи' },
+                { key: 'lib_e_education_resources', label: 'Онлайн-ресурсы' },
               ],
             },
           ],
         },
         {
-          label: 'Службы',
+          label: '🏀 Кружки и секции',
           items: [
-            { key: 'srv_accounting', label: 'Управление бухгалтерского учёта' },
-            { key: 'srv_hr', label: 'Управление по персоналу' },
-            { key: 'srv_admission', label: 'Работа с абитуриентами' },
-            { key: 'srv_ic', label: 'Международное сотрудничество' },
-            { key: 'srv_education', label: 'Воспитательная работа' },
-            { key: 'srv_projects', label: 'Центр проектной деятельности' },
-            { key: 'srv_student_bureau', label: 'Студенческое бюро' },
-            { key: 'srv_student_trade', label: 'Профсоюзный комитет' },
-          ],
-        },
-        {
-          label: 'Библиотеки',
-          items: [
-            { key: 'lib_subscriptions', label: 'Абонементы' },
-            { key: 'lib_reading_rooms', label: 'Читальные залы' },
-            { key: 'lib_e_reading_rooms', label: 'Электронный читальный зал' },
-            { key: 'lib_e_education_resources', label: 'Онлайн-ресурсы' },
-          ],
-        },
-        {
-          label: 'Дополнительно',
-          items: [
-            { key: 'contacts_masters', label: 'Институт магистратуры' },
-            { key: 'contacts_phd', label: 'Аспирантура и докторантура' },
-            { key: 'contacts_hostels', label: 'Общежития' },
-          ],
-        },
-        {
-          label: 'Секции и кружки',
-          items: [
-            { key: 'sec_patriot', label: 'Центр патриотического воспитания' },
-            { key: 'sec_sport', label: 'Спортивные секции' },
-            { key: 'sec_creative', label: 'Творческие кружки' },
-            { key: 'sec_science', label: 'Научные конференции' },
+            { key: 'sec_sport', label: '🏀 Спортивные секции' },
+            { key: 'sec_creative', label: '🎸 Творческие кружки' },
+            { key: 'sec_science', label: '🎓 Научные конференции' },
+            { key: 'sec_patriot', label: '🇷🇺 Патриотический центр' },
           ],
         },
       ];
@@ -1172,7 +1345,6 @@
             currentRole === 'superAdmin' ? '⭐ SuperAdmin' : '👤 Admin';
           document.getElementById('role-badge').className =
             'role-badge ' + currentRole;
-
           if (currentRole === 'superAdmin') {
             document.getElementById('tab-menus').style.display = 'flex';
             document.getElementById('tab-admins').style.display = 'flex';
@@ -1204,15 +1376,27 @@
       // ========================
       async function loadContent() {
         try {
-          const r = await fetch('/admin/api/content');
-          if (r.status === 401) {
+          // Загружаем контент и меню одновременно
+          const [contentR, menusR] = await Promise.all([
+            fetch('/admin/api/content'),
+            fetch('/admin/api/menus'),
+          ]);
+          if (contentR.status === 401) {
             window.location.href = '/admin/login';
             return;
           }
-          allContent = await r.json();
+          allContent = await contentR.json();
+          if (menusR.ok) {
+            allMenus = await menusR.json();
+            buildUrlButtons(); // строим карту URL-кнопок
+          }
           renderSidebar(allContent);
           setStatus(
-            'Данные загружены (' + Object.keys(allContent).length + ' записей)',
+            'Данные загружены (' +
+              Object.keys(allContent).length +
+              ' записей, ' +
+              Object.keys(allUrlButtons).length +
+              ' URL-кнопок)',
             'ok',
           );
         } catch (e) {
@@ -1220,113 +1404,253 @@
         }
       }
 
+      // Строим карту URL-кнопок из menus
+      function buildUrlButtons() {
+        allUrlButtons = {};
+        const menuLabels = {
+          main: '🏠 Главное меню',
+          contacts: '☎️ Контакты',
+          sections: '🏀 Кружки и секции',
+        };
+        for (const [menuId, menu] of Object.entries(allMenus)) {
+          for (const btn of menu.buttons || []) {
+            if (btn.type === 'url') {
+              const key = 'url::' + menuId + '::' + btn.id;
+              allUrlButtons[key] = {
+                key,
+                label: btn.label,
+                url: btn.value,
+                menuId,
+                btnId: btn.id,
+                menuLabel: menuLabels[menuId] || menuId,
+              };
+            }
+          }
+        }
+      }
+
+      // ========================
+      // SIDEBAR
+      // ========================
       function renderSidebar(content, query = '') {
         const list = document.getElementById('sidebar-list');
         list.innerHTML = '';
 
+        function matches(text, key) {
+          if (!query) return true;
+          const q = query.toLowerCase();
+          return (
+            text.toLowerCase().includes(q) || key.toLowerCase().includes(q)
+          );
+        }
+        function allLeafKeys(node) {
+          if (node.items) return node.items.map((i) => i.key);
+          if (node.sub) return node.sub.flatMap(allLeafKeys);
+          return [];
+        }
+
+        // ── СЕКЦИЯ URL-КНОПОК (рендерится первой) ──────────────────
+        renderUrlSection(list, query);
+
+        // ── ТЕКСТОВЫЙ КОНТЕНТ (ACCORDION) ──────────────────────────
         for (const group of ACCORDION) {
+          const groupKeys = allLeafKeys(group);
+          const anyItemInGroup = (k) => {
+            const allItems = group.sub
+              ? group.sub.flatMap((s) =>
+                  s.sub ? s.sub.flatMap((ss) => ss.items) : s.items || [],
+                )
+              : group.items || [];
+            return allItems.find((i) => i.key === k);
+          };
+          const groupMatch = groupKeys.some((k) => {
+            const item = anyItemInGroup(k);
+            return item && matches(item.label, k);
+          });
+          if (query && !groupMatch) continue;
+
+          const isGroupOpen =
+            openGroups.has(group.label) || (!!query && groupMatch);
           const groupEl = document.createElement('div');
           groupEl.className = 'acc-group';
 
-          // Собираем все ключи группы
-          const allKeys = group.sub
-            ? group.sub.flatMap((s) => s.items.map((i) => i.key))
-            : (group.items || []).map((i) => i.key);
-
-          const matchKeys = allKeys.filter((k) => {
-            if (!query) return true;
-            const item = (
-              group.sub ? group.sub.flatMap((s) => s.items) : group.items
-            ).find((i) => i.key === k);
-            return (
-              item &&
-              (item.label.toLowerCase().includes(query.toLowerCase()) ||
-                k.includes(query.toLowerCase()))
-            );
-          });
-
-          if (query && matchKeys.length === 0) continue;
-
           const header = document.createElement('div');
-          header.className = 'acc-header' + (!query ? ' open' : '');
+          header.className = 'acc-header' + (isGroupOpen ? ' open' : '');
           header.innerHTML = `<span>${group.label}</span><span class="chevron">▶</span>`;
-          header.onclick = () => {
-            header.classList.toggle('open');
-            body.classList.toggle('open');
-          };
-          groupEl.appendChild(header);
-
           const body = document.createElement('div');
-          body.className = 'acc-body' + (!query ? ' open' : '');
+          body.className = 'acc-body' + (isGroupOpen ? ' open' : '');
+          header.onclick = () => {
+            const nowOpen = header.classList.toggle('open');
+            body.classList.toggle('open');
+            if (nowOpen) openGroups.add(group.label);
+            else openGroups.delete(group.label);
+          };
 
-          if (group.sub) {
-            // 3-level: group → sub → items
-            for (const sub of group.sub) {
-              const subKeys = sub.items
-                .map((i) => i.key)
-                .filter((k) => {
-                  if (!query) return true;
-                  const item = sub.items.find((i) => i.key === k);
-                  return (
-                    item &&
-                    (item.label.toLowerCase().includes(query.toLowerCase()) ||
-                      k.includes(query.toLowerCase()))
-                  );
-                });
-              if (query && subKeys.length === 0) continue;
-
-              const subHeader = document.createElement('div');
-              subHeader.className = 'acc-sub-header' + (!query ? ' open' : '');
-              subHeader.innerHTML = `<span>${sub.label}</span><span class="chevron">▶</span>`;
-              const subBody = document.createElement('div');
-              subBody.className = 'acc-sub-body' + (!query ? ' open' : '');
-              subHeader.onclick = () => {
-                subHeader.classList.toggle('open');
-                subBody.classList.toggle('open');
-              };
-
-              for (const item of sub.items) {
-                if (
-                  query &&
-                  !item.label.toLowerCase().includes(query.toLowerCase()) &&
-                  !item.key.includes(query.toLowerCase())
-                )
-                  continue;
-                if (!content[item.key]) continue;
-                subBody.appendChild(makeNavItem(item));
-              }
-
-              body.appendChild(subHeader);
-              body.appendChild(subBody);
-            }
-          } else {
-            // 2-level: group → items
-            for (const item of group.items || []) {
-              if (
-                query &&
-                !item.label.toLowerCase().includes(query.toLowerCase()) &&
-                !item.key.includes(query.toLowerCase())
-              )
-                continue;
+          if (group.items) {
+            for (const item of group.items) {
+              if (query && !matches(item.label, item.key)) continue;
               if (!content[item.key]) continue;
               const el = makeNavItem(item);
               el.classList.add('l1');
               body.appendChild(el);
             }
+          } else if (group.sub) {
+            for (const sub of group.sub) {
+              const subLeafKeys = allLeafKeys(sub);
+              const subMatch = subLeafKeys.some((k) => {
+                const allItems = sub.sub
+                  ? sub.sub.flatMap((ss) => ss.items)
+                  : sub.items || [];
+                const item = allItems.find((i) => i.key === k);
+                return item && matches(item.label, k);
+              });
+              if (query && !subMatch) continue;
+
+              const isSubOpen =
+                openSubs.has(sub.label) || (!!query && subMatch);
+              const subHeader = document.createElement('div');
+              subHeader.className =
+                'acc-sub-header' + (isSubOpen ? ' open' : '');
+              subHeader.innerHTML = `<span>${sub.label}</span><span class="chevron">▶</span>`;
+              const subBody = document.createElement('div');
+              subBody.className = 'acc-sub-body' + (isSubOpen ? ' open' : '');
+              subHeader.onclick = () => {
+                const nowOpen = subHeader.classList.toggle('open');
+                subBody.classList.toggle('open');
+                if (nowOpen) openSubs.add(sub.label);
+                else openSubs.delete(sub.label);
+              };
+
+              if (sub.items) {
+                for (const item of sub.items) {
+                  if (query && !matches(item.label, item.key)) continue;
+                  if (!content[item.key]) continue;
+                  subBody.appendChild(makeNavItem(item));
+                }
+              } else if (sub.sub) {
+                for (const ss of sub.sub) {
+                  const ssKey = sub.label + '::' + ss.label;
+                  const ssMatch = (ss.items || []).some(
+                    (i) => matches(i.label, i.key) && content[i.key],
+                  );
+                  if (query && !ssMatch) continue;
+
+                  const isSSOpen =
+                    openSubSubs.has(ssKey) || (!!query && ssMatch);
+                  const ssHeader = document.createElement('div');
+                  ssHeader.className =
+                    'acc-sub-sub-header' + (isSSOpen ? ' open' : '');
+                  ssHeader.innerHTML = `<span>${ss.label}</span><span class="chevron">▶</span>`;
+                  const ssBody = document.createElement('div');
+                  ssBody.className =
+                    'acc-sub-sub-body' + (isSSOpen ? ' open' : '');
+                  ssHeader.onclick = () => {
+                    const nowOpen = ssHeader.classList.toggle('open');
+                    ssBody.classList.toggle('open');
+                    if (nowOpen) openSubSubs.add(ssKey);
+                    else openSubSubs.delete(ssKey);
+                  };
+                  for (const item of ss.items || []) {
+                    if (query && !matches(item.label, item.key)) continue;
+                    if (!content[item.key]) continue;
+                    const el = makeNavItem(item);
+                    el.classList.add('l3');
+                    ssBody.appendChild(el);
+                  }
+                  subBody.appendChild(ssHeader);
+                  subBody.appendChild(ssBody);
+                }
+              }
+
+              body.appendChild(subHeader);
+              body.appendChild(subBody);
+            }
           }
 
+          groupEl.appendChild(header);
           groupEl.appendChild(body);
           list.appendChild(groupEl);
         }
       }
 
+      // Рендерит секцию URL-кнопок в сайдбар
+      function renderUrlSection(list, query) {
+        if (Object.keys(allUrlButtons).length === 0) return;
+
+        // Группируем по menuLabel
+        const byMenu = {};
+        for (const btn of Object.values(allUrlButtons)) {
+          if (query && !btn.label.toLowerCase().includes(query.toLowerCase()))
+            continue;
+          if (!byMenu[btn.menuLabel]) byMenu[btn.menuLabel] = [];
+          byMenu[btn.menuLabel].push(btn);
+        }
+        if (Object.keys(byMenu).length === 0) return;
+
+        const URL_GROUP = '🔗 URL-кнопки';
+        const isGroupOpen = openGroups.has(URL_GROUP) || !!query;
+
+        const groupEl = document.createElement('div');
+        groupEl.className = 'acc-group';
+
+        const header = document.createElement('div');
+        header.className = 'acc-header' + (isGroupOpen ? ' open' : '');
+        header.innerHTML = `<span>${URL_GROUP}</span><span class="chevron">▶</span>`;
+        const body = document.createElement('div');
+        body.className = 'acc-body' + (isGroupOpen ? ' open' : '');
+        header.onclick = () => {
+          const nowOpen = header.classList.toggle('open');
+          body.classList.toggle('open');
+          if (nowOpen) openGroups.add(URL_GROUP);
+          else openGroups.delete(URL_GROUP);
+        };
+
+        for (const [menuLabel, btns] of Object.entries(byMenu)) {
+          const subKey = 'url-sub::' + menuLabel;
+          const isSubOpen = openSubs.has(subKey) || !!query;
+
+          const subHeader = document.createElement('div');
+          subHeader.className = 'acc-sub-header' + (isSubOpen ? ' open' : '');
+          subHeader.innerHTML = `<span>${menuLabel}</span><span class="chevron">▶</span>`;
+          const subBody = document.createElement('div');
+          subBody.className = 'acc-sub-body' + (isSubOpen ? ' open' : '');
+          subHeader.onclick = () => {
+            const nowOpen = subHeader.classList.toggle('open');
+            subBody.classList.toggle('open');
+            if (nowOpen) openSubs.add(subKey);
+            else openSubs.delete(subKey);
+          };
+
+          for (const btn of btns) {
+            subBody.appendChild(
+              makeNavItem({ key: btn.key, label: btn.label, isUrl: true }),
+            );
+          }
+
+          body.appendChild(subHeader);
+          body.appendChild(subBody);
+        }
+
+        groupEl.appendChild(header);
+        groupEl.appendChild(body);
+        list.appendChild(groupEl);
+      }
+
+      // Создаёт элемент навигации (работает для текста и URL)
       function makeNavItem(item) {
         const el = document.createElement('div');
+        const isUrl = item.isUrl || (item.key && item.key.startsWith('url::'));
+        const isActive = item.key === currentKey;
+        const isModified = isUrl ? modifiedUrls[item.key] : modified[item.key];
         el.className =
           'nav-item' +
-          (item.key === currentKey ? ' active' : '') +
-          (modified[item.key] ? ' modified' : '');
-        el.textContent = item.label;
+          (isActive ? ' active' : '') +
+          (isModified ? ' modified' : '');
+        if (isUrl) {
+          el.innerHTML = `<span>${item.label}</span><span class="url-badge">URL</span>`;
+        } else {
+          el.textContent = item.label;
+        }
         el.title = item.key;
         el.onclick = () => {
           selectKey(item.key, item.label);
@@ -1339,35 +1663,128 @@
         renderSidebar(allContent, q);
       }
 
+      // ========================
+      // SELECT KEY
+      // ========================
       function selectKey(key, label) {
         if (currentKey === key) return;
+
+        // Проверяем несохранённые изменения
+        const isUrlKey = key.startsWith('url::');
+        const curIsUrl = currentKey && currentKey.startsWith('url::');
+        const wasModified = curIsUrl
+          ? modifiedUrls[currentKey]
+          : modified[currentKey];
         if (
           currentKey &&
-          modified[currentKey] &&
+          wasModified &&
           !confirm('Есть несохранённые изменения. Продолжить?')
         )
           return;
+
+        // Авто-раскрываем путь для URL-кнопок
+        if (isUrlKey) {
+          const urlData = allUrlButtons[key];
+          if (urlData) {
+            openGroups.add('🔗 URL-кнопки');
+            openSubs.add('url-sub::' + urlData.menuLabel);
+          }
+        }
+
+        // Авто-раскрываем путь для текстового контента
+        for (const group of ACCORDION) {
+          if (group.items) {
+            if (group.items.some((i) => i.key === key))
+              openGroups.add(group.label);
+          } else if (group.sub) {
+            for (const sub of group.sub) {
+              if (sub.items && sub.items.some((i) => i.key === key)) {
+                openGroups.add(group.label);
+                openSubs.add(sub.label);
+              } else if (sub.sub) {
+                for (const ss of sub.sub) {
+                  if ((ss.items || []).some((i) => i.key === key)) {
+                    openGroups.add(group.label);
+                    openSubs.add(sub.label);
+                    openSubSubs.add(sub.label + '::' + ss.label);
+                  }
+                }
+              }
+            }
+          }
+        }
+
         currentKey = key;
-        document.getElementById('editor').value = allContent[key] || '';
-        document.getElementById('main-key').textContent = key;
+        // В main-key показываем упрощённый ключ для URL
+        document.getElementById('main-key').textContent = isUrlKey
+          ? key.split('::').slice(1).join(' / ')
+          : key;
         document.getElementById('main-title').textContent = label;
         document.getElementById('main-header').style.display = 'flex';
-        document.getElementById('editor-pane').style.display = 'flex';
         document.getElementById('empty-state').style.display = 'none';
-        if (window.innerWidth > 680)
-          document.getElementById('preview-pane').style.display = 'flex';
-        updatePreview();
-        updateCharCount();
+
+        if (isUrlKey) {
+          // ── URL РЕЖИМ ──────────────────────────────
+          document.getElementById('editor-pane').style.display = 'none';
+          document.getElementById('preview-pane').style.display = 'none';
+          document.getElementById('url-editor-pane').style.display = 'flex';
+
+          const urlData = allUrlButtons[key];
+          const urlVal = urlData ? urlData.url : '';
+          document.getElementById('url-input').value = urlVal;
+
+          const link = document.getElementById('url-preview-link');
+          if (urlVal) {
+            link.href = urlVal;
+            link.style.display = 'block';
+          } else {
+            link.style.display = 'none';
+          }
+        } else {
+          // ── ТЕКСТОВЫЙ РЕЖИМ ─────────────────────────
+          document.getElementById('url-editor-pane').style.display = 'none';
+          document.getElementById('editor-pane').style.display = 'flex';
+          if (window.innerWidth > 680)
+            document.getElementById('preview-pane').style.display = 'flex';
+          document.getElementById('editor').value = allContent[key] || '';
+          updatePreview();
+          updateCharCount();
+        }
+
         updateSaveBtn();
         renderSidebar(allContent, document.getElementById('search').value);
       }
 
+      // ========================
+      // EDIT HANDLERS
+      // ========================
       function onEdit() {
+        if (!currentKey || currentKey.startsWith('url::')) return;
         const val = document.getElementById('editor').value;
-        if (currentKey)
-          modified[currentKey] = val !== (allContent[currentKey] || '');
+        modified[currentKey] = val !== (allContent[currentKey] || '');
         if (mobilePreviewOpen || window.innerWidth > 680) updatePreview();
         updateCharCount();
+        updateSaveBtn();
+      }
+
+      function onUrlEdit() {
+        if (!currentKey || !currentKey.startsWith('url::')) return;
+        const val = document.getElementById('url-input').value.trim();
+        const urlData = allUrlButtons[currentKey];
+        modifiedUrls[currentKey] = val !== (urlData ? urlData.url : '');
+
+        const link = document.getElementById('url-preview-link');
+        if (
+          val &&
+          (val.startsWith('http') ||
+            val.startsWith('vk.') ||
+            val.startsWith('t.me'))
+        ) {
+          link.href = val.startsWith('http') ? val : 'https://' + val;
+          link.style.display = 'block';
+        } else {
+          link.style.display = 'none';
+        }
         updateSaveBtn();
       }
 
@@ -1386,17 +1803,96 @@
 
       function updateSaveBtn() {
         const btn = document.getElementById('save-btn');
-        btn.disabled = !currentKey || !modified[currentKey];
+        if (currentKey && currentKey.startsWith('url::')) {
+          btn.disabled = !modifiedUrls[currentKey];
+        } else {
+          btn.disabled = !currentKey || !modified[currentKey];
+        }
         btn.textContent = 'Сохранить';
         btn.className = 'btn-primary';
       }
 
+      // ========================
+      // SAVE
+      // ========================
       async function saveContent() {
         if (!currentKey) return;
-        const value = document.getElementById('editor').value;
+
         const btn = document.getElementById('save-btn');
         btn.disabled = true;
         btn.textContent = 'Сохраняю...';
+
+        // ── СОХРАНЕНИЕ URL-КНОПКИ ──────────────────────
+        if (currentKey.startsWith('url::')) {
+          const urlData = allUrlButtons[currentKey];
+          if (!urlData) return;
+          const newUrl = document.getElementById('url-input').value.trim();
+          if (!newUrl) {
+            showToast('URL не может быть пустым');
+            btn.disabled = false;
+            btn.textContent = 'Сохранить';
+            return;
+          }
+
+          try {
+            const r = await fetch(
+              '/admin/api/menus/' +
+                urlData.menuId +
+                '/buttons/' +
+                urlData.btnId,
+              {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  label: urlData.label,
+                  type: 'url',
+                  value: newUrl,
+                }),
+              },
+            );
+            if (r.status === 401) {
+              window.location.href = '/admin/login';
+              return;
+            }
+            if (r.ok) {
+              urlData.url = newUrl; // обновляем кэш
+              delete modifiedUrls[currentKey];
+
+              const link = document.getElementById('url-preview-link');
+              link.href = newUrl.startsWith('http')
+                ? newUrl
+                : 'https://' + newUrl;
+              link.style.display = 'block';
+
+              btn.textContent = 'Сохранено ✓';
+              btn.className = 'btn-primary saved';
+              showToast('Ссылка сохранена ✓');
+              setStatus('Сохранено: ' + urlData.label, 'ok');
+              renderSidebar(
+                allContent,
+                document.getElementById('search').value,
+              );
+              setTimeout(() => {
+                btn.textContent = 'Сохранить';
+                btn.className = 'btn-primary';
+                btn.disabled = true;
+              }, 2000);
+            } else throw new Error('Ошибка API');
+          } catch {
+            btn.textContent = 'Ошибка ✗';
+            btn.className = 'btn-primary error-state';
+            btn.disabled = false;
+            showToast('Ошибка сохранения!');
+            setTimeout(() => {
+              btn.textContent = 'Сохранить';
+              btn.className = 'btn-primary';
+            }, 3000);
+          }
+          return;
+        }
+
+        // ── СОХРАНЕНИЕ ТЕКСТОВОГО КОНТЕНТА ─────────────
+        const value = document.getElementById('editor').value;
         try {
           const r = await fetch(
             '/admin/api/content/' + encodeURIComponent(currentKey),
@@ -1474,9 +1970,7 @@
           <button class="btn-primary" style="flex:0;align-self:flex-end" onclick="addMenu()">+ Создать</button>
         </div>
       </div>
-    </div>
-  `;
-
+    </div>`;
         const tree = document.getElementById('menu-tree');
         for (const [menuId, menu] of Object.entries(allMenus)) {
           tree.appendChild(renderMenuNode(menuId, menu));
@@ -1554,12 +2048,7 @@
       }
 
       async function deleteMenu(menuId) {
-        if (
-          !confirm(
-            `Удалить меню "${menuId}"? Кнопки из других меню, ссылающиеся на него, тоже удалятся.`,
-          )
-        )
-          return;
+        if (!confirm(`Удалить меню "${menuId}"?`)) return;
         const r = await fetch('/admin/api/menus/' + menuId, {
           method: 'DELETE',
         });
@@ -1665,7 +2154,6 @@
 
       function renderAdmins(admins) {
         const panel = document.getElementById('admins-panel');
-        const superName = '(из .env)';
         panel.innerHTML = `
     <div class="panel-section">
       <div class="panel-section-header">SuperAdmin</div>
@@ -1673,15 +2161,12 @@
         <div class="admin-row">
           <span class="admin-role-badge" style="background:#fef3c7;color:#92400e">⭐ superAdmin</span>
           <span class="admin-row-name">${currentRole === 'superAdmin' ? currentUsername : '***'}</span>
-          <span class="admin-row-date">${superName}</span>
+          <span class="admin-row-date">(из .env)</span>
         </div>
       </div>
     </div>
     <div class="panel-section">
-      <div class="panel-section-header">
-        Администраторы
-        <span style="font-size:11px;color:#aaa;font-weight:400">${admins.length} чел.</span>
-      </div>
+      <div class="panel-section-header">Администраторы <span style="font-size:11px;color:#aaa;font-weight:400">${admins.length} чел.</span></div>
       <div class="panel-section-body">
         ${
           admins.length === 0
@@ -1801,14 +2286,23 @@
         mobilePreviewOpen = false;
         const p = document.getElementById('preview-pane');
         p.classList.remove('mobile-show');
-        if (window.innerWidth > 680 && currentKey) p.style.display = 'flex';
+        if (
+          window.innerWidth > 680 &&
+          currentKey &&
+          !currentKey.startsWith('url::')
+        )
+          p.style.display = 'flex';
         else p.style.display = 'none';
         document.getElementById('close-preview-btn').style.display = 'none';
         document.getElementById('preview-toggle').classList.remove('active');
         document.getElementById('preview-toggle').textContent = 'Просмотр';
       }
       window.addEventListener('resize', () => {
-        if (window.innerWidth > 680 && currentKey) {
+        if (
+          window.innerWidth > 680 &&
+          currentKey &&
+          !currentKey.startsWith('url::')
+        ) {
           const p = document.getElementById('preview-pane');
           p.style.display = 'flex';
           p.classList.remove('mobile-show');
@@ -1843,7 +2337,12 @@
       document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
           e.preventDefault();
-          if (currentKey && modified[currentKey]) saveContent();
+          const urlModified =
+            currentKey &&
+            currentKey.startsWith('url::') &&
+            modifiedUrls[currentKey];
+          const textModified = currentKey && modified[currentKey];
+          if (urlModified || textModified) saveContent();
         }
         if (e.key === 'Escape') {
           if (mobilePreviewOpen) closeMobilePreview();

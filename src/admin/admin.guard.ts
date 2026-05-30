@@ -1,13 +1,29 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import type { Request } from 'express';
-// import '../../src/types/session';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Request>();
     const role = req.session?.role;
-    return role === 'admin' || role === 'superAdmin';
+
+    // 401 если сессии нет вообще
+    if (!role) {
+      throw new UnauthorizedException('Требуется авторизация');
+    }
+
+    // 403 если роль не подходит
+    if (role !== 'admin' && role !== 'superAdmin') {
+      throw new ForbiddenException('Доступ запрещён');
+    }
+
+    return true;
   }
 }
 
@@ -15,6 +31,16 @@ export class AdminGuard implements CanActivate {
 export class SuperAdminGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Request>();
-    return req.session?.role === 'superAdmin';
+    const role = req.session?.role;
+
+    if (!role) {
+      throw new UnauthorizedException('Требуется авторизация');
+    }
+
+    if (role !== 'superAdmin') {
+      throw new ForbiddenException('Требуются права суперадминистратора');
+    }
+
+    return true;
   }
 }
