@@ -1,14 +1,23 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import session from 'express-session';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
+import * as path from 'path';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { resolveAdminUiDir } from './admin/admin-ui.paths';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const logger = new Logger('Bootstrap');
+
+  const adminUiDir = resolveAdminUiDir();
+  app.useStaticAssets(path.join(adminUiDir, 'assets'), {
+    prefix: '/admin/assets',
+  });
 
   // ── БЕЗОПАСНОСТЬ: HTTP-заголовки ──────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -65,6 +74,7 @@ async function bootstrap() {
   );
 
   // ── ГЛОБАЛЬНАЯ ВАЛИДАЦИЯ ──────────────────────────────────────
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

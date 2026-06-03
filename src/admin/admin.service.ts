@@ -1,8 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { randomUUID, timingSafeEqual } from 'crypto';
+import { timingSafeEqual } from 'crypto';
 import { hash as bcryptHash, compare as bcryptCompare } from 'bcryptjs';
-import * as fs from 'fs';
-import * as path from 'path';
+import { AdminRepository } from './admin.repository';
 
 export interface AdminUser {
   id: string;
@@ -12,7 +11,6 @@ export interface AdminUser {
   createdAt: string;
 }
 
-// Тип публичного представления пользователя (без хэша пароля)
 export type SafeAdminUser = Omit<AdminUser, 'passwordHash'>;
 
 const BCRYPT_ROUNDS = 12;
@@ -20,44 +18,19 @@ const BCRYPT_ROUNDS = 12;
 @Injectable()
 export class AdminService implements OnModuleInit {
   private readonly logger = new Logger(AdminService.name);
-  private readonly filePath = path.resolve(
-    process.cwd(),
-    'data',
-    'admins.json',
-  );
-  private users: AdminUser[] = [];
 
-  onModuleInit() {
-    this.loadFromDisk();
-  }
+  constructor(private readonly adminRepository: AdminRepository) {}
 
-  private loadFromDisk(): void {
-    try {
-      fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
-      if (!fs.existsSync(this.filePath)) {
-        fs.writeFileSync(this.filePath, '[]', 'utf-8');
-      }
-      const raw = fs.readFileSync(this.filePath, 'utf-8');
-      this.users = JSON.parse(raw) as AdminUser[];
-      this.logger.log(`Загружено ${this.users.length} администраторов`);
-    } catch (err) {
-      this.logger.error('Ошибка загрузки admins.json:', err);
-      this.users = [];
+  async onModuleInit(): Promise<void> {
+    const total = await this.adminRepository.count();
+    this.logger.log(`Администраторы в БД: ${total} шт.`);
+    if (total === 0) {
+      this.logger.warn(
+        'Таблица администраторов пуста. Выполните: npm run db:seed',
+      );
     }
   }
 
-  private saveToDisk(): void {
-    fs.writeFileSync(
-      this.filePath,
-      JSON.stringify(this.users, null, 2),
-      'utf-8',
-    );
-  }
-
-  /**
-   * Возвращает публичное представление пользователя без хэша пароля.
-   * Явное перечисление полей — защита от случайной утечки новых полей.
-   */
   private toSafeUser(user: AdminUser): SafeAdminUser {
     return {
       id: user.id,
@@ -67,13 +40,22 @@ export class AdminService implements OnModuleInit {
     };
   }
 
-  // ── АУТЕНТИФИКАЦИЯ ────────────────────────────────────────────
+  private recordToUser(record: {
+    id: string;
+    username: string;
+    passwordHash: string;
+    role: string;
+    createdAt: Date;
+  }): AdminUser {
+    return {
+      id: record.id,
+      username: record.username,
+      passwordHash: record.passwordHash,
+      role: record.role as AdminUser['role'],
+      createdAt: record.createdAt.toISOString(),
+    };
+  }
 
-  /**
-   * timingSafeEqual защищает от timing-атак:
-   * злоумышленник не может угадать символы пароля
-   * по разнице во времени ответа сервера.
-   */
   validateSuperAdmin(username: string, password: string): boolean {
     const envUser = process.env.SUPER_ADMIN_USERNAME ?? 'superadmin';
     const envPass = process.env.SUPER_ADMIN_PASSWORD ?? '';
@@ -86,8 +68,6 @@ export class AdminService implements OnModuleInit {
     }
 
     try {
-      // timingSafeEqual требует буферы одинаковой длины —
-      // проверяем длины явно перед вызовом
       if (
         username.length !== envUser.length ||
         password.length !== envPass.length
@@ -112,18 +92,17 @@ export class AdminService implements OnModuleInit {
     username: string,
     password: string,
   ): Promise<AdminUser | null> {
-    const user = this.users.find(
-      (u) => u.username === username && u.role === 'admin',
-    );
-    if (!user) return null;
-    const isValid = await bcryptCompare(password, user.passwordHash);
-    return isValid ? user : null;
+    const record = await this.adminRepository.findByUsername(username);
+    if (!record || record.role !== 'admin') return null;
+    const isValid = await bcryptCompare(password, record.passwordHash);
+    return isValid ? this.recordToUser(record) : null;
   }
 
-  // ── CRUD ──────────────────────────────────────────────────────
-
-  getAllAdmins(): SafeAdminUser[] {
-    return this.users.map((u) => this.toSafeUser(u));
+  async getAllAdmins(): Promise<SafeAdminUser[]> {
+    const records = await this.adminRepository.findAll();
+    return records
+      .filter((r) => r.role === 'admin')
+      .map((r) => this.toSafeUser(this.recordToUser(r)));
   }
 
   async createAdmin(
@@ -136,7 +115,8 @@ export class AdminService implements OnModuleInit {
     if (password.length < 8) {
       throw new Error('Пароль должен содержать не менее 8 символов');
     }
-    if (this.users.find((u) => u.username === username)) {
+    const existing = await this.adminRepository.findByUsername(username);
+    if (existing) {
       throw new Error(`Пользователь "${username}" уже существует`);
     }
     if (username === (process.env.SUPER_ADMIN_USERNAME ?? 'superadmin')) {
@@ -144,37 +124,26 @@ export class AdminService implements OnModuleInit {
     }
 
     const passwordHash = await bcryptHash(password, BCRYPT_ROUNDS);
-    const user: AdminUser = {
-      id: randomUUID(),
-      username,
-      passwordHash,
-      role: 'admin',
-      createdAt: new Date().toISOString(),
-    };
-    this.users.push(user);
-    this.saveToDisk();
+    const record = await this.adminRepository.create(username, passwordHash);
     this.logger.log(`Создан администратор: ${username}`);
-
-    return this.toSafeUser(user);
+    return this.toSafeUser(this.recordToUser(record));
   }
 
-  deleteAdmin(id: string): void {
-    const idx = this.users.findIndex((u) => u.id === id);
-    if (idx === -1) throw new Error('Пользователь не найден');
-    const removed = this.users[idx];
-    this.users.splice(idx, 1);
-    this.saveToDisk();
-    this.logger.log(`Удалён администратор: ${removed?.username ?? id}`);
+  async deleteAdmin(id: string): Promise<void> {
+    const record = await this.adminRepository.findById(id);
+    if (!record) throw new Error('Пользователь не найден');
+    await this.adminRepository.delete(id);
+    this.logger.log(`Удалён администратор: ${record.username}`);
   }
 
   async changePassword(id: string, newPassword: string): Promise<void> {
-    const user = this.users.find((u) => u.id === id);
-    if (!user) throw new Error('Пользователь не найден');
+    const record = await this.adminRepository.findById(id);
+    if (!record) throw new Error('Пользователь не найден');
     if (!newPassword.trim() || newPassword.length < 8) {
       throw new Error('Пароль должен содержать не менее 8 символов');
     }
-    user.passwordHash = await bcryptHash(newPassword, BCRYPT_ROUNDS);
-    this.saveToDisk();
-    this.logger.log(`Изменён пароль для: ${user.username}`);
+    const passwordHash = await bcryptHash(newPassword, BCRYPT_ROUNDS);
+    await this.adminRepository.updatePassword(id, passwordHash);
+    this.logger.log(`Изменён пароль для: ${record.username}`);
   }
 }

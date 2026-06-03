@@ -23,7 +23,7 @@ export class BotLauncher implements OnModuleInit {
       await this.botService.updateUserActivity(userId);
 
       const welcomeText = `👋 Привет, ${userName}!\n👨‍🎓 Я чат‑помощник для студентов РГЭУ (РИНХ). Готов помочь!`;
-      const keyboard = this.botService.getMainMenuKeyboard();
+      const keyboard = await this.botService.getMainMenuKeyboard();
 
       await ctx.reply(welcomeText, {
         attachments: [Keyboard.inlineKeyboard(keyboard)],
@@ -60,7 +60,7 @@ export class BotLauncher implements OnModuleInit {
         if (!data) return;
 
         await this.botService.updateUserActivity(userId);
-        const response = this.botService.handleCallback(data, userName);
+        const response = await this.botService.handleCallback(data, userName);
 
         await ctx.answerOnCallback({
           message: {

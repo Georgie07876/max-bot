@@ -20,8 +20,21 @@ model Admin {
 model ContentBlock {
   id          String   @id // Ключ из content.json (например, "welcome_message")
   text        String
-  description String?  
+  description String?
   updatedAt   DateTime @updatedAt
+}
+
+// Журнал изменений контента (замена data/changes.log)
+model ContentAuditLog {
+  id        String   @id @default(uuid())
+  blockId   String
+  adminName String
+  oldText   String
+  newText   String
+  createdAt DateTime @default(now())
+
+  @@index([blockId])
+  @@index([createdAt])
 }
 
 // Таблица для страниц меню (ключи из menus.json, например "main_menu")

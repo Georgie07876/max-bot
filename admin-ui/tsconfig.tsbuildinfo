@@ -1,0 +1,1 @@
+{"root":["./src/main.ts","./src/vite-env.d.ts","./src/api/client.ts","./src/data/accordion.ts","./src/app.vue","./src/components/accordionnav.vue","./src/components/tabs/adminstab.vue","./src/components/tabs/contenttab.vue","./src/components/tabs/menustab.vue","./src/views/dashboardview.vue","./src/views/loginview.vue"],"version":"5.8.3"}

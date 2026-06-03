@@ -1,9 +1,6 @@
 version: '3.8'
 
 services:
-  # ──────────────────────────────────────────────────
-  # ПРИЛОЖЕНИЕ
-  # ──────────────────────────────────────────────────
   app:
     build:
       context: .
@@ -19,23 +16,21 @@ services:
       - SUPER_ADMIN_PASSWORD=${SUPER_ADMIN_PASSWORD}
       - SESSION_SECRET=${SESSION_SECRET}
       - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=file:/app/data/app.db
       - PORT=3000
     volumes:
-      - ./data:/app/data # персистентность JSON-файлов
+      - app_data:/app/data
     depends_on:
       redis:
         condition: service_healthy
 
-  # ──────────────────────────────────────────────────
-  # REDIS
-  # ──────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: rinh_assistant_redis
     restart: unless-stopped
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes # персистентность Redis
+    command: redis-server --appendonly yes
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
@@ -43,4 +38,5 @@ services:
       retries: 5
 
 volumes:
+  app_data:
   redis_data:

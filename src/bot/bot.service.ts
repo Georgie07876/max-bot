@@ -4,6 +4,7 @@ import { Redis } from 'ioredis';
 import { Keyboard } from '@maxhub/max-bot-api';
 import { ContentService } from '../content/content.service';
 import { MenuService } from './menu.service';
+import { StatsService } from '../stats/stats.service';
 
 // KeyboardButtons не экспортируется из bot.buttons.ts (там только данные).
 // Определяем тип здесь. any[][]
@@ -21,23 +22,22 @@ export class BotService {
     @InjectRedis() private readonly redis: Redis,
     private readonly contentService: ContentService,
     private readonly menuService: MenuService,
+    private readonly statsService: StatsService,
   ) {}
 
   async updateUserActivity(userId: string): Promise<void> {
     await this.redis.setex(`user:${userId}:status`, 120, 'active');
   }
 
-  /**
-   * Количество активных пользователей за последние 2 минуты.
-   * Redis хранит ключи с TTL — они автоматически истекают.
-   */
-  async getActiveUsersCount(): Promise<number> {
-    const keys = await this.redis.keys('user:*:status');
-    return keys.length;
+  getActiveUsersCount(): Promise<number> {
+    return this.statsService.getActiveUsersCount();
   }
 
-  handleCallback(data: string, userName = 'студент'): BotResponse {
-    const startMenu = this.menuService.getMenu('main');
+  async handleCallback(
+    data: string,
+    userName = 'студент',
+  ): Promise<BotResponse> {
+    const startMenu = await this.menuService.getMenu('main');
     const welcomeText =
       startMenu?.text.replace('Добро пожаловать!', `Привет, ${userName}!`) ??
       `👋 Привет, ${userName}!`;
@@ -46,14 +46,15 @@ export class BotService {
       return this.buildMenuResponse('main', welcomeText);
     }
 
-    const menu = this.menuService.getMenu(data);
+    const menu = await this.menuService.getMenu(data);
     if (menu) {
       return this.buildMenuResponse(data, menu.text);
     }
 
-    const content = this.contentService.get(data);
+    const content = await this.contentService.get(data);
     if (content) {
-      const parentMenuId = this.menuService.findParentMenuId(data) ?? 'main';
+      const parentMenuId =
+        (await this.menuService.findParentMenuId(data)) ?? 'main';
       return {
         text: content,
         reply_markup: {
@@ -75,8 +76,11 @@ export class BotService {
     };
   }
 
-  private buildMenuResponse(menuId: string, text: string): BotResponse {
-    const menu = this.menuService.getMenu(menuId);
+  private async buildMenuResponse(
+    menuId: string,
+    text: string,
+  ): Promise<BotResponse> {
+    const menu = await this.menuService.getMenu(menuId);
     if (!menu) return this.handleCallback('nav_start');
 
     const rows: KeyboardButtons = [];
@@ -98,8 +102,8 @@ export class BotService {
     return { text, reply_markup: { inline_keyboard: rows } };
   }
 
-  getMainMenuKeyboard(): KeyboardButtons {
-    const menu = this.menuService.getMenu('main');
+  async getMainMenuKeyboard(): Promise<KeyboardButtons> {
+    const menu = await this.menuService.getMenu('main');
     if (!menu) {
       return [[Keyboard.button.callback('⬅️ В начало', 'nav_start')]];
     }

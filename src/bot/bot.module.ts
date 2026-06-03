@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ContentModule } from '../content/content.module';
 import { BotService } from './bot.service';
 import { BotLauncher } from './bot.launcher';
-import { ContentModule } from '../content/content.module';
+import { StatsService } from '../stats/stats.service';
 
 @Module({
   imports: [
+    ContentModule,
     RedisModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -15,8 +17,8 @@ import { ContentModule } from '../content/content.module';
         url: config.get<string>('REDIS_URL', 'redis://localhost:6379'),
       }),
     }),
-    ContentModule,
   ],
-  providers: [BotService, BotLauncher],
+  providers: [BotService, BotLauncher, StatsService],
+  exports: [BotService, StatsService],
 })
 export class BotModule {}
