@@ -1,0 +1,9 @@
+[
+  {
+    "id": "beb51eac-50b1-4215-8496-c46dba1b6411",
+    "username": "George",
+    "passwordHash": "2a757b6bd0c0240e5adbe971ab32799c533ed419e39b6afc9130efde24c65f17",
+    "role": "admin",
+    "createdAt": "2026-04-14T18:31:46.351Z"
+  }
+]
